@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-project(Assignment_2_OpenGL)
+project(OpenGLLevelRenderer)
 
 # currently using unicode in some libraries on win32 but will change soon
 ADD_DEFINITIONS(-DUNICODE)
@@ -16,5 +16,5 @@ if (UNIX AND NOT APPLE)
      link_libraries(${OPENGL_LIBRARIES})
 endif()
 
-add_executable (Assignment_2_OpenGL main.cpp renderer.h)
+add_executable (OpenGLLevelRenderer main.cpp renderer.h FileIO.h)
 
