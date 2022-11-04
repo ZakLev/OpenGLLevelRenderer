@@ -39,6 +39,7 @@ void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<
                {
                    std::getline(file, line);
                    std::cout << line.c_str() << std::endl;
+                   if(i == 0)
                    line.erase(0, 11);
                    filter(line);
                    std::istringstream iss(line);
