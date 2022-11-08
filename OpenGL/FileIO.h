@@ -9,10 +9,11 @@ class FileIO
 
 public:
    
-void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, char* fileName = "../Assets/GameLevel.txt")
+void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, char* fileName = "../../Assets/GameLevel.txt")
 {
     std::ifstream file;
-    file.open("C:\\Users\\Aweso\\Documents\\GitHub\\Assignment_2_OpenGL\\Assets\\GameLevel.txt");//Error Finding Text File -- Temp Fix
+ //  fileName =  "C:\\Users\\levin\\OneDrive\\Documents\\GitHub\\OpenGLLevelRenderer\\Assets\\GameLevel.txt"; //Error Finding Text File -- Temp Fix
+    file.open(fileName);// -- fixed
     if (file.is_open()) {
         std::string line;
         while (std::getline(file, line))
