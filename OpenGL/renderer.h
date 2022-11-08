@@ -213,11 +213,12 @@ public:
 		glGenBuffers(1, &vertexBufferObject);
 		glBindVertexArray(vertexArray);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
+		//glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(lvlData.parsers[0].vertices[0]), (void*)&lvlData.parsers[0].vertices[0], GL_STATIC_DRAW);
 		// TODO: Part 1g
 		glGenBuffers(1, &indiciesBuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(FSLogo_indices), FSLogo_indices, GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(lvlData.parsers[0].indices[0]), (void*)&lvlData.parsers[0].indices[0], GL_STATIC_DRAW);
 		// TODO: Part 2c
 		glGenBuffers(1, &uboBuffer);
 		glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
@@ -313,7 +314,7 @@ public:
 		// TODO: Part 2g
 		glUniformBlockBinding(shaderExecutable, block_index, 0);
 		// TODO: Part 3b
-		for (int i = 0; i < FSLogo_meshcount; i++) 
+		for (int i = 0; i < lvlData.parsers[0].meshCount; i++)
 		{
 
 			// TODO: Part 4d
@@ -321,14 +322,16 @@ public:
 			{
 				UBO.world = GW::MATH::GIdentityMatrixF;
 			}
-			else
+			/*else
 			{
 				matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(-ftheta), worldMat);
 				UBO.world = worldMat;
-			}
+			}*/
 			// TODO: Part 3c
 			
-				UBO.material = FSLogo_materials[i].attrib;
+				//UBO.material = FSLogo_materials[i].attrib;
+			OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[0].materials[i].attrib;
+			UBO.material = *obj;
 
 				glBindBuffer(GL_ARRAY_BUFFER, uboBuffer);
 				// get pointer
@@ -342,7 +345,8 @@ public:
 		//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
 		//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
 			
-		glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
+		//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
+				glDrawElements(GL_TRIANGLES, lvlData.parsers[0].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[0].batches[i].indexOffset));
 		}
 		// some video cards(cough Intel) need this set back to zero or they won't display
 		glBindVertexArray(0);
