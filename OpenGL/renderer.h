@@ -53,7 +53,7 @@ vec4 pos4 = vec4(local_pos, 1);
  vec4 positionV = positionW* viewMatrix;
  vec4 position = positionV* projectionMatrix;
 gl_Position = vec4(position);
-worldPos = vec3(gl_Position);
+worldPos = vec3(positionW);
 	// TODO: Part 4b
 	vec3 nrm = vec3(vec4(local_nrm, 0.0) * world);
     world_nrm = nrm;
@@ -102,13 +102,14 @@ vec3 nrm = normalize(world_nrm);
 float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
 	// TODO: Part 4e
 	// TODO: Part 4f (half-vector or reflect method)
-     vec3 reflectDir = reflect(normalize(-sunDirection.xyz), nrm);
-vec3 posW = vec3(worldPos.x,worldPos.y-0.5,worldPos.z);
+     vec3 reflectDir = reflect(normalize(sunDirection.xyz), nrm);
+vec3 posW = vec3(worldPos.x,worldPos.y,worldPos.z);
 vec3 camDir = normalize(camPos.xyz - posW.xyz );
-      float spec = pow(max(dot(camDir, reflectDir), 0.0), 500);
-//vec4 specular = spec * sunColor;
-vec4 diffuse = (sunAmbient + diff + spec) * sunColor;
-Pixel =( diffuse  ) * color;
+      float spec = pow(max(dot(camDir, reflectDir), 0.0), material.Ns);
+vec3 specular = spec * material.Ks;
+vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
+Pixel = vec4(diffuse,1);
+//Pixel = vec4(diffuse,1) * color;
 }
 )";
 // Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
@@ -208,31 +209,6 @@ public:
 		glDebugMessageCallback(MessageCallback, 0);
 #endif
 		// TODO: Part 1c
-		/*struct ver
-		{
-			float x, y, z;
-		};*/
-		// Create Vertex Buffer
-		/*float verts[] = {
-			   0,   0.5f,
-			 0.5f, -0.5f,
-			-0.5f, -0.5f
-		};*/
-		//ver verts[3885];
-		//float verts[3885*3];
-		//int h = 0;
-		//for (int i = 0; i < 3885; i++)
-		//{
-		//	//verts[i].x = FSLogo_vertices[i].pos.x;
-		//	verts[h] = FSLogo_vertices[i].pos.x;
-		//	h += 1;
-		//	//verts[i].y = FSLogo_vertices[i].pos.y;
-		//	verts[h] = FSLogo_vertices[i].pos.y;
-		//	h += 1;
-		//	//verts[i].z = FSLogo_vertices[i].pos.z;
-		//	verts[h] = FSLogo_vertices[i].pos.z;
-		//	h += 1;
-		//}
 		glGenVertexArrays(1, &vertexArray);
 		glGenBuffers(1, &vertexBufferObject);
 		glBindVertexArray(vertexArray);

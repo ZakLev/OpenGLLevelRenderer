@@ -3,13 +3,14 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include "h2bParser.h"
 #define GATEWARE_ENABLE_MATH  // Math Library
 class FileIO
 {
-
+    H2B::Parser parser;
 public:
    
-void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, char* fileName = "../../Assets/GameLevel.txt")
+void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, std::vector<H2B::Parser>& parsers, char* fileName = "../../Assets/GameLevel.txt")
 {
     std::ifstream file;
  //  fileName =  "C:\\Users\\levin\\OneDrive\\Documents\\GitHub\\OpenGLLevelRenderer\\Assets\\GameLevel.txt"; //Error Finding Text File -- Temp Fix
@@ -31,7 +32,13 @@ void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<
                {
                    line.erase(checkDecimal);
                }
-               Names.push_back(line + ".h2b");
+               std::string namePath = "../../Assets/Models/" + line + ".h2b";
+               Names.push_back(namePath);
+               parser.Parse(namePath.c_str());
+               parsers.push_back(parser);
+               parser.Clear();
+               //verts.push_back(parser.vertices);
+              // parser.Clear();
                GW::MATH::GMATRIXF mat = GW::MATH::GIdentityMatrixF;
                
                int k = 0;
