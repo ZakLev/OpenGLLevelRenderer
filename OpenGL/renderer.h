@@ -1,6 +1,7 @@
 // minimalistic code to draw a single triangle, this is not part of the API.
 // TODO: Part 1b
  #include "../Assets/FSLogo.h"
+#include "LevelData.h"
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
 #version 330 // GLSL 3.30
@@ -160,6 +161,8 @@ class Renderer
 	} UBO;
 	// TODO: Part 4e
 public:
+	//Level Data
+	LevelData::LevelData lvlData;
 	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
 	{
 		win = _win;

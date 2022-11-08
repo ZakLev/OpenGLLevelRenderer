@@ -13,6 +13,7 @@
 #include "../Gateware/Gateware.h"
 #include "renderer.h" // example rendering code (not Gateware code!)
 #include "FileIO.h"
+#include "LevelData.h"
 // open some namespaces to compact the code a bit
 using namespace GW;
 using namespace CORE;
@@ -25,15 +26,17 @@ int main()
 	GEventResponder msgs;
 	GOpenGLSurface ogl;
 	FileIO readFile;
+	
 	std::vector<GW::MATH::GMATRIXF> worldPositions = {};
 	std::vector<std::string> Names = {};
 	readFile.ReadGameLevel(worldPositions,Names);
+	
 	if (+win.Create(0, 0, 800, 600, GWindowStyle::WINDOWEDBORDERED))
 	{
 		
 
 		float clr[] = { 48 / 255.0f, 20 / 255.0f, 150 / 255.0f, 1 }; // TODO: Part 1a
-		win.SetWindowName("Zak Levine Assignment 2 - OpenGL");
+		win.SetWindowName("Zak Levine LevelRenderer - OpenGL");
 		msgs.Create([&](const GW::GEvent& e) {
 			GW::SYSTEM::GWindow::Events q;
 			if (+e.Read(q) && q == GWindow::Events::RESIZE)
@@ -44,6 +47,8 @@ int main()
 		if (+ogl.Create(win, GW::GRAPHICS::DEPTH_BUFFER_SUPPORT))
 		{
 			Renderer renderer(win, ogl);
+			renderer.lvlData.SetWorldPosition(worldPositions);
+			renderer.lvlData.SetNames(Names);
 			while (+win.ProcessWindowEvents())
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);
