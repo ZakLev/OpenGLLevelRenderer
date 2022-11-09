@@ -279,22 +279,40 @@ Pixel = vec4(diffuse,1);
 		}
 		void Render()
 		{
+			int cm = 1;
 			//Get Delta Time
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
 			ftheta = deltaTime * 5;
 			prevTime = currTime;
 			// TODO: Part 2a
+			/*for (int cm = 0; cm < lvlData.parsers.size(); cm++)
+			{
+				if (!lvlData.parsers[cm].materials.empty())
+				{*/
+
 			// setup the pipeline
 			//World
 			GLint locationW = glGetUniformLocation(shaderExecutable, "world");
-			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
+			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
+			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
 			//Camera
 			GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
 			glUniformMatrix4fv(locationV, 1, GL_FALSE, (GLfloat*)&viewMat);
 			//Projection
 			GLint locationP = glGetUniformLocation(shaderExecutable, "projectionMatrix");
 			glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
+
+			//glGenVertexArrays(1, &vertexArray);
+			//glGenBuffers(1, &vertexBufferObject);
+			glBindVertexArray(vertexArray);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[cm].vertices.size(), lvlData.parsers[cm].vertices.data(), GL_STATIC_DRAW);
+			// TODO: Part 1g
+			//glGenBuffers(1, &indiciesBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[cm].indices.size()), lvlData.parsers[cm].indices.data(), GL_STATIC_DRAW);
+			
 
 			// TODO: Part 1e
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
@@ -325,13 +343,13 @@ Pixel = vec4(diffuse,1);
 			// TODO: Part 2g
 			glUniformBlockBinding(shaderExecutable, block_index, 0);
 			// TODO: Part 3b
-			for (int i = 0; i < lvlData.parsers[1].meshCount; i++)
+			for (int i = 0; i < lvlData.parsers[cm].meshCount; i++)
 			{
 
 				// TODO: Part 4d
 				if (i == 0)
 				{
-					UBO.world = GW::MATH::GIdentityMatrixF;
+					//UBO.world = GW::MATH::GIdentityMatrixF;
 				}
 				/*else
 				{
@@ -339,9 +357,9 @@ Pixel = vec4(diffuse,1);
 					UBO.world = worldMat;
 				}*/
 				// TODO: Part 3c
-
+				UBO.world = lvlData.worldPositions[cm];
 					//UBO.material = FSLogo_materials[i].attrib;
-				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[1].materials[i].attrib;
+				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[cm].materials[i].attrib;
 				UBO.material = *obj;
 
 				glBindBuffer(GL_ARRAY_BUFFER, uboBuffer);
@@ -357,8 +375,10 @@ Pixel = vec4(diffuse,1);
 			//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
 
 			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
-				glDrawElements(GL_TRIANGLES, lvlData.parsers[1].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[1].batches[i].indexOffset));
+				glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
 			}
+			//	}
+			//}
 			// some video cards(cough Intel) need this set back to zero or they won't display
 			glBindVertexArray(0);
 		}

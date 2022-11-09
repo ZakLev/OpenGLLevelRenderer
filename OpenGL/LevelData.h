@@ -7,7 +7,7 @@
 
 
 
-	class LevelData
+	class LevelData // Object Oriented not Data Oriented -- except they are in seperate vectors instead of a model object
 	{
 	private:
 		
