@@ -2,6 +2,9 @@
 // TODO: Part 1b
  #include "../Assets/FSLogo.h"
 #include "LevelData.h"
+#include "h2bParser.h"
+#include <vector>
+#include "FileIO.h"
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
 #version 330 // GLSL 3.30
@@ -121,217 +124,225 @@ Pixel = vec4(diffuse,1);
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 	}
 #endif
+	LevelData lvlData;
 // Creation, Rendering & Cleanup
-class Renderer
-{
-	// proxy handles
-	GW::SYSTEM::GWindow win;
-	GW::GRAPHICS::GOpenGLSurface ogl;
-	// what we need at a minimum to draw a triangle
-	GLuint vertexArray = 0;
-	GLuint vertexBufferObject = 0;
-	// TODO: Part 1g
-	GLuint indiciesBuffer = 0;
-	GLuint vertexShader = 0;
-	GLuint fragmentShader = 0;
-	GLuint shaderExecutable = 0;
-	// TODO: Part 2c
-	GLuint uboBuffer = 0;
-	// TODO: Part 2a
-	GW::MATH::GMatrix matMath;
-	GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
-	GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
-	GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
-	GW::MATH::GVECTORF lightDir = {-1,-1,-2,0};
-	GW::MATH::GVECTORF lightColor = {0.9f,0.9f,1,1};
-	GW::MATH::GVECTORF lightAmbient = { 0.25f,0.25f,0.35f,1 };
-	float fov = G_DEGREE_TO_RADIAN_F(65.0f); float fNear = .1f; float fFar = 100.0f; float AR;
-	std::chrono::steady_clock::time_point prevTime;
-	std::chrono::microseconds FPS;
-	float ftheta = 0;
-	// TODO: Part 2b
-	 struct UBO_DATA
+	class Renderer
 	{
-		// global scene data, updated each frame
-		GW::MATH::GVECTORF sunDirection, sunColor; //lighting info
-		GW::MATH::GMATRIXF viewMatrix, projectionMatrix; // viewing info
-		//sub-mesh transform and material data, updated each draw
-		GW::MATH::GMATRIXF world; // final world space transform
-		OBJ_ATTRIBUTES material; // color/texture of surface
-		GW::MATH::GVECTORF sunAmbient, camPos;
-	} UBO;
-	// TODO: Part 4e
-public:
-	//Level Data
-	LevelData::LevelData lvlData;
-	Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
-	{
-		win = _win;
-		ogl = _ogl;
-		// TODO: part 2a
-		
-		 matMath.Create();
-		//World
-	//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
-		//Camera
-		GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
-		GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f};
-		GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f }; 
-	//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
-		/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
-		matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
-		
-		matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
-	    //matMath.InverseF(viewMat, viewMat);
-		//Projection
-		_ogl.GOpenGLSurface::GetAspectRatio(AR);
-		matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
-		
-		// TODO: Part 2b
-		
-		UBO.sunDirection = lightDir;
-		UBO.sunColor = lightColor;
-		UBO.viewMatrix = viewMat;
-		UBO.projectionMatrix = projMat;
-		UBO.world = worldMat;
-		UBO.material = FSLogo_materials[0].attrib;
 
-
-		
-		// TODO: Part 4e
-		UBO.sunAmbient = lightAmbient;
-		UBO.camPos = cameraPos;
-		// Link Needed OpenGL API functions
-		LoadExtensions();
-		// In debug mode we link openGL errors to the console
-#ifndef NDEBUG
-		glEnable(GL_DEBUG_OUTPUT);
-		glDebugMessageCallback(MessageCallback, 0);
-#endif
-		// TODO: Part 1c
-		glGenVertexArrays(1, &vertexArray);
-		glGenBuffers(1, &vertexBufferObject);
-		glBindVertexArray(vertexArray);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		//glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(lvlData.parsers[0].vertices[0]), (void*)&lvlData.parsers[0].vertices[0], GL_STATIC_DRAW);
+		//FileIO readFile;
+		//static LevelData lvlData;
+		// proxy handles
+		GW::SYSTEM::GWindow win;
+		GW::GRAPHICS::GOpenGLSurface ogl;
+		// what we need at a minimum to draw a triangle
+		GLuint vertexArray = 0;
+		GLuint vertexBufferObject = 0;
 		// TODO: Part 1g
-		glGenBuffers(1, &indiciesBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(lvlData.parsers[0].indices[0]), (void*)&lvlData.parsers[0].indices[0], GL_STATIC_DRAW);
+		GLuint indiciesBuffer = 0;
+		GLuint vertexShader = 0;
+		GLuint fragmentShader = 0;
+		GLuint shaderExecutable = 0;
 		// TODO: Part 2c
-		glGenBuffers(1, &uboBuffer);
-		glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-		glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		GLuint uboBuffer = 0;
+		// TODO: Part 2a
+		GW::MATH::GMatrix matMath;
+		GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
+		GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
+		GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
+		GW::MATH::GVECTORF lightDir = { -1,-1,-2,0 };
+		GW::MATH::GVECTORF lightColor = { 0.9f,0.9f,1,1 };
+		GW::MATH::GVECTORF lightAmbient = { 0.25f,0.25f,0.35f,1 };
+		float fov = G_DEGREE_TO_RADIAN_F(65.0f); float fNear = .1f; float fFar = 100.0f; float AR;
+		std::chrono::steady_clock::time_point prevTime;
+		std::chrono::microseconds FPS;
+		float ftheta = 0;
+		// TODO: Part 2b
+		struct UBO_DATA
+		{
+			// global scene data, updated each frame
+			GW::MATH::GVECTORF sunDirection, sunColor; //lighting info
+			GW::MATH::GMATRIXF viewMatrix, projectionMatrix; // viewing info
+			//sub-mesh transform and material data, updated each draw
+			GW::MATH::GMATRIXF world; // final world space transform
+			OBJ_ATTRIBUTES material; // color/texture of surface
+			GW::MATH::GVECTORF sunAmbient, camPos;
+		} UBO;
+		// TODO: Part 4e
 
-		//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-		GLuint binding_point_index = 0;
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-		GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-		memcpy(p, &UBO, sizeof(UBO));
+	public:
+		//Level Data
+		 //LevelData lvlData;
+
+		Renderer() {}
+		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
+		{
+			
+			win = _win;
+			ogl = _ogl;
+			// TODO: part 2a
+
+			matMath.Create();
+			//World
+		//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
+			//Camera
+			GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
+			GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
+			GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
+			//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
+				/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
+				matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
+
+			matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
+			//matMath.InverseF(viewMat, viewMat);
+			//Projection
+			_ogl.GOpenGLSurface::GetAspectRatio(AR);
+			matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
+
+			// TODO: Part 2b
+
+			UBO.sunDirection = lightDir;
+			UBO.sunColor = lightColor;
+			UBO.viewMatrix = viewMat;
+			UBO.projectionMatrix = projMat;
+			UBO.world = worldMat;
+			UBO.material = FSLogo_materials[0].attrib;
+			//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
+
+
+			// TODO: Part 4e
+			UBO.sunAmbient = lightAmbient;
+			UBO.camPos = cameraPos;
+			// Link Needed OpenGL API functions
+			LoadExtensions();
+			// In debug mode we link openGL errors to the console
+#ifndef NDEBUG
+			glEnable(GL_DEBUG_OUTPUT);
+			glDebugMessageCallback(MessageCallback, 0);
+#endif
+			// TODO: Part 1c
+			glGenVertexArrays(1, &vertexArray);
+			glGenBuffers(1, &vertexBufferObject);
+			glBindVertexArray(vertexArray);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[1].vertices.size(), lvlData.parsers[1].vertices.data(), GL_STATIC_DRAW);
+			// TODO: Part 1g
+			glGenBuffers(1, &indiciesBuffer);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[1].indices.size()), lvlData.parsers[1].indices.data(), GL_STATIC_DRAW);
+			// TODO: Part 2c
+			glGenBuffers(1, &uboBuffer);
+			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+			//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+			GLuint binding_point_index = 0;
+			glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+			GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+			memcpy(p, &UBO, sizeof(UBO));
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-		// Create Vertex Shader
-		vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-		glCompileShader(vertexShader);
-		char errors[1024]; GLint result;
-		glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
-		if (result == false)
-		{
-			glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
-			std::cout << errors << std::endl;
-		}
-		// Create Fragment Shader
-		fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-		glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-		glCompileShader(fragmentShader);
-		glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
-		if (result == false)
-		{
-			glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
-			std::cout << errors << std::endl;
-		}
-		// Create Executable Shader Program
-		shaderExecutable = glCreateProgram();
-		glAttachShader(shaderExecutable, vertexShader);
-		glAttachShader(shaderExecutable, fragmentShader);
-		glLinkProgram(shaderExecutable);
-		glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
-		if (result == false) 
-		{
-			glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
-			std::cout << errors << std::endl;
-		}
-		
-	}
-	void Render()
-	{
-		//Get Delta Time
-		std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
-		float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
-		ftheta =  deltaTime * 5;
-		prevTime = currTime;
-		// TODO: Part 2a
-		// setup the pipeline
-		//World
-		GLint locationW = glGetUniformLocation(shaderExecutable, "world");
-		glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
-		//Camera
-		GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
-		glUniformMatrix4fv(locationV, 1, GL_FALSE, (GLfloat*)&viewMat);
-		//Projection
-		GLint locationP = glGetUniformLocation(shaderExecutable, "projectionMatrix");
-		glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
-	
-		// TODO: Part 1e
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		glUseProgram(shaderExecutable);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		glUseProgram(shaderExecutable);
-		glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		glUseProgram(shaderExecutable);
-		// now we can draw
-		glBindVertexArray(vertexArray);
-		glUseProgram(shaderExecutable);
-		// TODO: Part 1d
-		// TODO: Part 1h
-		
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-		glUseProgram(shaderExecutable);
-		// TODO: Part 2e
-		unsigned int block_index = glGetUniformBlockIndex(shaderExecutable, "UBO");
-		// TODO: Part 2f
-		GLuint binding_point_index = 0;
-		glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-		// TODO: Part 2g
-		glUniformBlockBinding(shaderExecutable, block_index, 0);
-		// TODO: Part 3b
-		for (int i = 0; i < lvlData.parsers[0].meshCount; i++)
-		{
-
-			// TODO: Part 4d
-			if (i == 0)
+			// Create Vertex Shader
+			vertexShader = glCreateShader(GL_VERTEX_SHADER);
+			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+			glCompileShader(vertexShader);
+			char errors[1024]; GLint result;
+			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
+			if (result == false)
 			{
-				UBO.world = GW::MATH::GIdentityMatrixF;
+				glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
+				std::cout << errors << std::endl;
 			}
-			/*else
+			// Create Fragment Shader
+			fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+			glCompileShader(fragmentShader);
+			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
+			if (result == false)
 			{
-				matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(-ftheta), worldMat);
-				UBO.world = worldMat;
-			}*/
-			// TODO: Part 3c
-			
-				//UBO.material = FSLogo_materials[i].attrib;
-			OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[0].materials[i].attrib;
-			UBO.material = *obj;
+				glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
+				std::cout << errors << std::endl;
+			}
+			// Create Executable Shader Program
+			shaderExecutable = glCreateProgram();
+			glAttachShader(shaderExecutable, vertexShader);
+			glAttachShader(shaderExecutable, fragmentShader);
+			glLinkProgram(shaderExecutable);
+			glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
+			if (result == false)
+			{
+				glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
+				std::cout << errors << std::endl;
+			}
+
+		}
+		void Render()
+		{
+			//Get Delta Time
+			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
+			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
+			ftheta = deltaTime * 5;
+			prevTime = currTime;
+			// TODO: Part 2a
+			// setup the pipeline
+			//World
+			GLint locationW = glGetUniformLocation(shaderExecutable, "world");
+			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
+			//Camera
+			GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
+			glUniformMatrix4fv(locationV, 1, GL_FALSE, (GLfloat*)&viewMat);
+			//Projection
+			GLint locationP = glGetUniformLocation(shaderExecutable, "projectionMatrix");
+			glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
+
+			// TODO: Part 1e
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			glUseProgram(shaderExecutable);
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			glUseProgram(shaderExecutable);
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			glUseProgram(shaderExecutable);
+			// now we can draw
+			glBindVertexArray(vertexArray);
+			glUseProgram(shaderExecutable);
+			// TODO: Part 1d
+			// TODO: Part 1h
+
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
+			glUseProgram(shaderExecutable);
+			// TODO: Part 2e
+			unsigned int block_index = glGetUniformBlockIndex(shaderExecutable, "UBO");
+			// TODO: Part 2f
+			GLuint binding_point_index = 0;
+			glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+			// TODO: Part 2g
+			glUniformBlockBinding(shaderExecutable, block_index, 0);
+			// TODO: Part 3b
+			for (int i = 0; i < lvlData.parsers[1].meshCount; i++)
+			{
+
+				// TODO: Part 4d
+				if (i == 0)
+				{
+					UBO.world = GW::MATH::GIdentityMatrixF;
+				}
+				/*else
+				{
+					matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(-ftheta), worldMat);
+					UBO.world = worldMat;
+				}*/
+				// TODO: Part 3c
+
+					//UBO.material = FSLogo_materials[i].attrib;
+				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[1].materials[i].attrib;
+				UBO.material = *obj;
 
 				glBindBuffer(GL_ARRAY_BUFFER, uboBuffer);
 				// get pointer
@@ -340,30 +351,37 @@ public:
 				memcpy(ptr, &UBO, sizeof(UBO));
 				// make sure to tell OpenGL we're done with the pointer
 				glUnmapBuffer(GL_ARRAY_BUFFER);
-			
-			// TODO: Part 4e
-		//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
-		//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
-			
-		//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
-				glDrawElements(GL_TRIANGLES, lvlData.parsers[0].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[0].batches[i].indexOffset));
+
+				// TODO: Part 4e
+			//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
+			//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
+
+			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
+				glDrawElements(GL_TRIANGLES, lvlData.parsers[1].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[1].batches[i].indexOffset));
+			}
+			// some video cards(cough Intel) need this set back to zero or they won't display
+			glBindVertexArray(0);
 		}
-		// some video cards(cough Intel) need this set back to zero or they won't display
-		glBindVertexArray(0);
-	}
-	~Renderer()
-	{
-		// free resources
-		glDeleteVertexArrays(1, &vertexArray);
-		glDeleteBuffers(1, &vertexBufferObject);
-		// TODO: Part 1g
-		glDeleteBuffers(1, &indiciesBuffer);
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-		glDeleteProgram(shaderExecutable);
-		// TODO: Part 2c
-		glDeleteBuffers(1, &uboBuffer);
-	}
+		void data(LevelData& Data)
+		{
+			
+			lvlData = Data;
+		}
+		~Renderer()
+		{
+			// free resources
+			glDeleteVertexArrays(1, &vertexArray);
+			glDeleteBuffers(1, &vertexBufferObject);
+			// TODO: Part 1g
+			glDeleteBuffers(1, &indiciesBuffer);
+			glDeleteShader(vertexShader);
+			glDeleteShader(fragmentShader);
+			glDeleteProgram(shaderExecutable);
+			// TODO: Part 2c
+			glDeleteBuffers(1, &uboBuffer);
+		}
+	
+		
 private:
 	// Modern OpenGL API Functions must be queried before use
 	PFNGLCREATESHADERPROC				glCreateShader = nullptr;

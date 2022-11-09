@@ -27,12 +27,19 @@ int main()
 	GEventResponder msgs;
 	GOpenGLSurface ogl;
 	FileIO readFile;
+    LevelData data;
+	readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
+	Renderer renderer;
+	renderer.data(data);
 	//H2B::Parser parser;
-	std::vector<GW::MATH::GMATRIXF> worldPositions = {};
+	/*std::vector<GW::MATH::GMATRIXF> worldPositions = {};
 	std::vector<std::string> Names = {};
-	std::vector<H2B::Parser> parsers = {};
-	readFile.ReadGameLevel(worldPositions,Names,parsers);
-	
+	std::vector<H2B::Parser> parsers = {};*/
+	/*readFile.ReadGameLevel(worldPositions,Names,parsers);
+	ren.lvlData.SetWorldPosition(worldPositions);
+	ren.lvlData.SetNames(Names);
+	ren.lvlData.SetParser(parsers);*/
+	//ren.lvlData.parsers = parsers;
 	if (+win.Create(0, 0, 800, 600, GWindowStyle::WINDOWEDBORDERED))
 	{
 		
@@ -49,9 +56,7 @@ int main()
 		if (+ogl.Create(win, GW::GRAPHICS::DEPTH_BUFFER_SUPPORT))
 		{
 			Renderer renderer(win, ogl);
-			renderer.lvlData.SetWorldPosition(worldPositions);
-			renderer.lvlData.SetNames(Names);
-			renderer.lvlData.SetParser(parsers);
+			
 			while (+win.ProcessWindowEvents())
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);

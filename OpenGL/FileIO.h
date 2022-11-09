@@ -34,9 +34,9 @@ void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<
                }
                std::string namePath = "../../Assets/Models/" + line + ".h2b";
                Names.push_back(namePath);
+               parser.Clear();
                parser.Parse(namePath.c_str());
                parsers.push_back(parser);
-               parser.Clear();
                //verts.push_back(parser.vertices);
               // parser.Clear();
                GW::MATH::GMATRIXF mat = GW::MATH::GIdentityMatrixF;
