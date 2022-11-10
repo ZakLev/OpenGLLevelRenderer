@@ -15,6 +15,7 @@
 #include "FileIO.h"
 #include "LevelData.h"
 #include "h2bParser.h"
+#include "Model.h"
 // open some namespaces to compact the code a bit
 using namespace GW;
 using namespace CORE;
@@ -28,9 +29,12 @@ int main()
 	GOpenGLSurface ogl;
 	FileIO readFile;
     LevelData data;
-	readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
+	std::vector<Model> models = {};
+	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
+	readFile.ReadGameLevel(models);
 	Renderer renderer;
-	renderer.data(data);
+	renderer.transferData(models);
+	//renderer.data(data);
 	//H2B::Parser parser;
 	/*std::vector<GW::MATH::GMATRIXF> worldPositions = {};
 	std::vector<std::string> Names = {};

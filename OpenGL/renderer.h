@@ -4,7 +4,7 @@
 #include "LevelData.h"
 #include "h2bParser.h"
 #include <vector>
-#include "FileIO.h"
+#include "Model.h"
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
 #version 330 // GLSL 3.30
@@ -124,7 +124,8 @@ Pixel = vec4(diffuse,1);
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 	}
 #endif
-	LevelData lvlData;
+	//LevelData lvlData;
+	std::vector<Model> models;
 // Creation, Rendering & Cleanup
 	class Renderer
 	{
@@ -225,11 +226,11 @@ Pixel = vec4(diffuse,1);
 			glBindVertexArray(vertexArray);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			//glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[1].vertices.size(), lvlData.parsers[1].vertices.data(), GL_STATIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[1].vertices.size(), lvlData.parsers[1].vertices.data(), GL_STATIC_DRAW);
 			// TODO: Part 1g
 			glGenBuffers(1, &indiciesBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[1].indices.size()), lvlData.parsers[1].indices.data(), GL_STATIC_DRAW);
+			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[1].indices.size()), lvlData.parsers[1].indices.data(), GL_STATIC_DRAW);
 			// TODO: Part 2c
 			glGenBuffers(1, &uboBuffer);
 			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
@@ -295,7 +296,8 @@ Pixel = vec4(diffuse,1);
 			//World
 			GLint locationW = glGetUniformLocation(shaderExecutable, "world");
 			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
-			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
+			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
+			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&models[cm].worldPosition);
 			//Camera
 			GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
 			glUniformMatrix4fv(locationV, 1, GL_FALSE, (GLfloat*)&viewMat);
@@ -307,11 +309,13 @@ Pixel = vec4(diffuse,1);
 			//glGenBuffers(1, &vertexBufferObject);
 			glBindVertexArray(vertexArray);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[cm].vertices.size(), lvlData.parsers[cm].vertices.data(), GL_STATIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[cm].vertices.size(), lvlData.parsers[cm].vertices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * models[cm].parser.vertices.size(), models[cm].parser.vertices.data(), GL_STATIC_DRAW);
 			// TODO: Part 1g
 			//glGenBuffers(1, &indiciesBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[cm].indices.size()), lvlData.parsers[cm].indices.data(), GL_STATIC_DRAW);
+			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[cm].indices.size()), lvlData.parsers[cm].indices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (models[cm].parser.indices.size()), models[cm].parser.indices.data(), GL_STATIC_DRAW);
 			
 
 			// TODO: Part 1e
@@ -343,7 +347,8 @@ Pixel = vec4(diffuse,1);
 			// TODO: Part 2g
 			glUniformBlockBinding(shaderExecutable, block_index, 0);
 			// TODO: Part 3b
-			for (int i = 0; i < lvlData.parsers[cm].meshCount; i++)
+		//	for (int i = 0; i < lvlData.parsers[cm].meshCount; i++)
+				for (int i = 0; i < models[cm].parser.meshCount; i++)
 			{
 
 				// TODO: Part 4d
@@ -357,9 +362,11 @@ Pixel = vec4(diffuse,1);
 					UBO.world = worldMat;
 				}*/
 				// TODO: Part 3c
-				UBO.world = lvlData.worldPositions[cm];
+				//UBO.world = lvlData.worldPositions[cm];
+				UBO.world = models[cm].worldPosition;
 					//UBO.material = FSLogo_materials[i].attrib;
-				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[cm].materials[i].attrib;
+				//OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[cm].materials[i].attrib;
+				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&models[cm].parser.materials[i].attrib;
 				UBO.material = *obj;
 
 				glBindBuffer(GL_ARRAY_BUFFER, uboBuffer);
@@ -375,17 +382,23 @@ Pixel = vec4(diffuse,1);
 			//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
 
 			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
-				glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
+				//glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
+				glDrawElements(GL_TRIANGLES, models[cm].parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * models[cm].parser.batches[i].indexOffset));
 			}
 			//	}
 			//}
 			// some video cards(cough Intel) need this set back to zero or they won't display
 			glBindVertexArray(0);
 		}
-		void data(LevelData& Data)
+		/*void data(LevelData& Data)
 		{
 			
 			lvlData = Data;
+		}*/
+		void transferData(std::vector<Model>& modelsData)
+		{
+
+			models = modelsData;
 		}
 		~Renderer()
 		{
