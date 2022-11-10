@@ -126,6 +126,11 @@ Pixel = vec4(diffuse,1);
 #endif
 	//LevelData lvlData;
 	std::vector<Model> models;
+	void getModels(std::vector<Model>& modelsData)
+	{
+
+		models = modelsData;
+	}
 // Creation, Rendering & Cleanup
 	class Renderer
 	{
@@ -174,109 +179,112 @@ Pixel = vec4(diffuse,1);
 		//Level Data
 		 //LevelData lvlData;
 
-		Renderer() {}
+
 		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
 		{
-			
-			win = _win;
-			ogl = _ogl;
-			// TODO: part 2a
+			int cm = 1;
+			/*for (int cm = 0; cm < models.size(); cm++)
+			{*/
 
-			matMath.Create();
-			//World
-		//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
-			//Camera
-			GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
-			GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
-			GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
-			//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
-				/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
-				matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
+				win = _win;
+				ogl = _ogl;
+				// TODO: part 2a
 
-			matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
-			//matMath.InverseF(viewMat, viewMat);
-			//Projection
-			_ogl.GOpenGLSurface::GetAspectRatio(AR);
-			matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
+				matMath.Create();
+				//World
+			//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
+				//Camera
+				GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
+				GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
+				GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
+				//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
+					/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
+					matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
 
-			// TODO: Part 2b
+				matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
+				//matMath.InverseF(viewMat, viewMat);
+				//Projection
+				_ogl.GOpenGLSurface::GetAspectRatio(AR);
+				matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
 
-			UBO.sunDirection = lightDir;
-			UBO.sunColor = lightColor;
-			UBO.viewMatrix = viewMat;
-			UBO.projectionMatrix = projMat;
-			UBO.world = worldMat;
-			UBO.material = FSLogo_materials[0].attrib;
-			//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
+				// TODO: Part 2b
+
+				UBO.sunDirection = lightDir;
+				UBO.sunColor = lightColor;
+				UBO.viewMatrix = viewMat;
+				UBO.projectionMatrix = projMat;
+				UBO.world = worldMat;
+				UBO.material = FSLogo_materials[0].attrib;
+				//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
 
 
-			// TODO: Part 4e
-			UBO.sunAmbient = lightAmbient;
-			UBO.camPos = cameraPos;
-			// Link Needed OpenGL API functions
-			LoadExtensions();
-			// In debug mode we link openGL errors to the console
+				// TODO: Part 4e
+				UBO.sunAmbient = lightAmbient;
+				UBO.camPos = cameraPos;
+				// Link Needed OpenGL API functions
+				LoadExtensions();
+				// In debug mode we link openGL errors to the console
 #ifndef NDEBUG
-			glEnable(GL_DEBUG_OUTPUT);
-			glDebugMessageCallback(MessageCallback, 0);
+				glEnable(GL_DEBUG_OUTPUT);
+				glDebugMessageCallback(MessageCallback, 0);
 #endif
-			// TODO: Part 1c
-			glGenVertexArrays(1, &vertexArray);
-			glGenBuffers(1, &vertexBufferObject);
-			glBindVertexArray(vertexArray);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(FSLogo_vertices), FSLogo_vertices, GL_STATIC_DRAW);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[1].vertices.size(), lvlData.parsers[1].vertices.data(), GL_STATIC_DRAW);
-			// TODO: Part 1g
-			glGenBuffers(1, &indiciesBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[1].indices.size()), lvlData.parsers[1].indices.data(), GL_STATIC_DRAW);
-			// TODO: Part 2c
-			glGenBuffers(1, &uboBuffer);
-			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
+				// TODO: Part 1c
+				glGenVertexArrays(1, &vertexArray);
+				glGenBuffers(1, &vertexBufferObject);
+				glBindVertexArray(vertexArray);
+				glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(models[cm].parser.vertices), (void*)&models[cm].parser.vertices, GL_STATIC_DRAW);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * models[cm].parser.vertices.size(), models[cm].parser.vertices.data(), GL_STATIC_DRAW);
+				// TODO: Part 1g
+				glGenBuffers(1, &indiciesBuffer);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (models[cm].parser.indices.size()), models[cm].parser.indices.data(), GL_STATIC_DRAW);
+				// TODO: Part 2c
+				glGenBuffers(1, &uboBuffer);
+				glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+				glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
+				glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-			//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			GLuint binding_point_index = 0;
-			glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-			GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-			memcpy(p, &UBO, sizeof(UBO));
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+				//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+				GLuint binding_point_index = 0;
+				glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+				GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+				memcpy(p, &UBO, sizeof(UBO));
+				glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-			// Create Vertex Shader
-			vertexShader = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-			glCompileShader(vertexShader);
-			char errors[1024]; GLint result;
-			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
-			if (result == false)
-			{
-				glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
-			// Create Fragment Shader
-			fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-			glCompileShader(fragmentShader);
-			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
-			if (result == false)
-			{
-				glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
-			// Create Executable Shader Program
-			shaderExecutable = glCreateProgram();
-			glAttachShader(shaderExecutable, vertexShader);
-			glAttachShader(shaderExecutable, fragmentShader);
-			glLinkProgram(shaderExecutable);
-			glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
-			if (result == false)
-			{
-				glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
-
+				// Create Vertex Shader
+				vertexShader = glCreateShader(GL_VERTEX_SHADER);
+				glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+				glCompileShader(vertexShader);
+				char errors[1024]; GLint result;
+				glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
+				if (result == false)
+				{
+					glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
+					std::cout << errors << std::endl;
+				}
+				// Create Fragment Shader
+				fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+				glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+				glCompileShader(fragmentShader);
+				glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
+				if (result == false)
+				{
+					glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
+					std::cout << errors << std::endl;
+				}
+				// Create Executable Shader Program
+				shaderExecutable = glCreateProgram();
+				glAttachShader(shaderExecutable, vertexShader);
+				glAttachShader(shaderExecutable, fragmentShader);
+				glLinkProgram(shaderExecutable);
+				glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
+				if (result == false)
+				{
+					glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
+					std::cout << errors << std::endl;
+				}
+			//}
 		}
 		void Render()
 		{
@@ -287,9 +295,9 @@ Pixel = vec4(diffuse,1);
 			ftheta = deltaTime * 5;
 			prevTime = currTime;
 			// TODO: Part 2a
-			/*for (int cm = 0; cm < lvlData.parsers.size(); cm++)
+			/*for (int cm = 0; cm < models.size(); cm++)
 			{
-				if (!lvlData.parsers[cm].materials.empty())
+				if (!models[cm].parser.materials.empty())
 				{*/
 
 			// setup the pipeline
@@ -304,19 +312,6 @@ Pixel = vec4(diffuse,1);
 			//Projection
 			GLint locationP = glGetUniformLocation(shaderExecutable, "projectionMatrix");
 			glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
-
-			//glGenVertexArrays(1, &vertexArray);
-			//glGenBuffers(1, &vertexBufferObject);
-			glBindVertexArray(vertexArray);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			//glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * lvlData.parsers[cm].vertices.size(), lvlData.parsers[cm].vertices.data(), GL_STATIC_DRAW);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * models[cm].parser.vertices.size(), models[cm].parser.vertices.data(), GL_STATIC_DRAW);
-			// TODO: Part 1g
-			//glGenBuffers(1, &indiciesBuffer);
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (lvlData.parsers[cm].indices.size()), lvlData.parsers[cm].indices.data(), GL_STATIC_DRAW);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (models[cm].parser.indices.size()), models[cm].parser.indices.data(), GL_STATIC_DRAW);
-			
 
 			// TODO: Part 1e
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
@@ -364,6 +359,7 @@ Pixel = vec4(diffuse,1);
 				// TODO: Part 3c
 				//UBO.world = lvlData.worldPositions[cm];
 				UBO.world = models[cm].worldPosition;
+				//UBO.world = GW::MATH::GIdentityMatrixF;
 					//UBO.material = FSLogo_materials[i].attrib;
 				//OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[cm].materials[i].attrib;
 				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&models[cm].parser.materials[i].attrib;
@@ -384,10 +380,10 @@ Pixel = vec4(diffuse,1);
 			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
 				//glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
 				glDrawElements(GL_TRIANGLES, models[cm].parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * models[cm].parser.batches[i].indexOffset));
-			}
-			//	}
-			//}
+			/*}
+				}*/
 			// some video cards(cough Intel) need this set back to zero or they won't display
+			}
 			glBindVertexArray(0);
 		}
 		/*void data(LevelData& Data)

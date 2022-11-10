@@ -11,11 +11,11 @@
 #define GATEWARE_DISABLE_GRASTERSURFACE // we have another template for this
 // With what we want & what we don't defined we can include the API
 #include "../Gateware/Gateware.h"
+#include "Model.h"
 #include "renderer.h" // example rendering code (not Gateware code!)
 #include "FileIO.h"
 #include "LevelData.h"
 #include "h2bParser.h"
-#include "Model.h"
 // open some namespaces to compact the code a bit
 using namespace GW;
 using namespace CORE;
@@ -32,8 +32,10 @@ int main()
 	std::vector<Model> models = {};
 	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
 	readFile.ReadGameLevel(models);
-	Renderer renderer;
-	renderer.transferData(models);
+	/*Renderer renderer;
+	renderer.transferData(models);*/
+	getModels(models);
+	
 	//renderer.data(data);
 	//H2B::Parser parser;
 	/*std::vector<GW::MATH::GMATRIXF> worldPositions = {};
