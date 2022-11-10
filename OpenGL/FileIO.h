@@ -30,7 +30,7 @@ void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/Ga
                std::istringstream iss(line);
                std::cout << line.c_str() << std::endl;
                int checkDecimal = line.length() - 4;
-               if (line.compare(checkDecimal, checkDecimal, "."))
+               if (line.compare(checkDecimal, 1, ".") == 0)
                {
                    line.erase(checkDecimal);
                }
