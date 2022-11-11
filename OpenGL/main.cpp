@@ -3,6 +3,7 @@
 #define GATEWARE_ENABLE_SYSTEM // Graphics libs require system level libraries
 #define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
 #define GATEWARE_ENABLE_MATH  // Math Library
+#define GATEWARE_ENABLE_INPUT
 // TODO: Part 2a
 // Ignore some GRAPHICS libraries we aren't going to use
 #define GATEWARE_DISABLE_GDIRECTX11SURFACE // we have another template for this
@@ -29,7 +30,7 @@ int main()
 	GOpenGLSurface ogl;
 	FileIO readFile;
     LevelData data;
-	std::vector<Model> models = {};
+	std::vector<Model*> models = {};
 	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
 	readFile.ReadGameLevel(models);
 	/*Renderer renderer;

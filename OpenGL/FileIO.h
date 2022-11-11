@@ -12,7 +12,7 @@ class FileIO
 public:
    
 //void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, std::vector<H2B::Parser>& parsers, char* fileName = "../../Assets/GameLevel.txt")
-void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/GameLevel.txt")
+void ReadGameLevel(std::vector<Model*>& models, char* fileName = "../../Assets/GameLevel.txt")
 {
     std::ifstream file;
  //  fileName =  "C:\\Users\\levin\\OneDrive\\Documents\\GitHub\\OpenGLLevelRenderer\\Assets\\GameLevel.txt"; //Error Finding Text File -- Temp Fix
@@ -35,13 +35,13 @@ void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/Ga
                    line.erase(checkDecimal);
                }
                std::string namePath = "../../Assets/Models/" + line + ".h2b";
-               Model newModel;
-               newModel.Name = line;
-               newModel.NamePath = namePath;
+               Model* newModel = new Model();
+               newModel->Name = line;
+               newModel->NamePath = namePath;
                //Names.push_back(namePath);
                parser.Clear();
                parser.Parse(namePath.c_str());
-               newModel.parser = parser;
+               newModel->parser = parser;
                //parsers.push_back(parser);
                //verts.push_back(parser.vertices);
               // parser.Clear();
@@ -66,8 +66,9 @@ void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/Ga
                   
                }
               // worldPositions.push_back(mat);
-               newModel.worldPosition = mat;
-               models.push_back(newModel);
+               newModel->worldPosition = mat;
+               models.reserve(models.size() + 1);
+               models.emplace_back(newModel);
            }
         }
     }
