@@ -285,21 +285,34 @@
 				//	std::cout << errors << std::endl;
 				//}
 			//}
-				
+				/*for (int i = 0; i < models.size(); i++)
+				{
+					if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
+						models[i]->UploadModelDataToGPU(win,ogl);
+				}*/
 				/*for each (Model* m in models)
 				{
-					
 					m->UploadModelDataToGPU(win, ogl);
 				}*/
 //models[0]->UploadModelDataToGPU(win, ogl);
 
-                models[1]->UploadModelDataToGPU(win, ogl);
+               models[1]->UploadModelDataToGPU(win, ogl);
+
 		}
 		void Render()
 		{
 			//models[0]->DrawModel();
 			models[1]->UpdateCamera();
 			models[1]->DrawModel();
+			/*for (int i = 0; i < models.size();i++)
+			{
+				if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
+				models[i]->DrawModel();
+			}*/
+			/*for each (Model * m in models)
+			{
+				m->UpdateCamera();
+			}*/
 			/*for each (Model* m in models)
 			{
 				m->DrawModel();

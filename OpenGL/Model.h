@@ -320,15 +320,18 @@ public:
 			glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
 
 			// TODO: Part 1e
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
+			/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);*/
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
 			glEnableVertexAttribArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			glUseProgram(shaderExecutable);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);
+			/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);*/
+			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)12);
 			glEnableVertexAttribArray(1);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			glUseProgram(shaderExecutable);
-			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);
+			/*glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);*/
+			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)24);
 			glEnableVertexAttribArray(2);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			glUseProgram(shaderExecutable);

@@ -69,6 +69,7 @@ void ReadGameLevel(std::vector<Model*>& models, char* fileName = "../../Assets/G
                newModel->worldPosition = mat;
                models.reserve(models.size() + 1);
                models.emplace_back(newModel);
+            //   std::cout << newModel->Name << std::endl;
            }
         }
     }
