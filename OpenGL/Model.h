@@ -395,13 +395,13 @@ public:
 			}
 			glBindVertexArray(0);
 		}
-		void UpdateCamera()
+		void UpdateCamera(float _SPLSLF)
 		{
 
-			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
-			FPSInput = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTimeInput);
-			float SPSLF = FPSInput.count() / 100000.0f;
-
+			//std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
+			//FPSInput = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTimeInput);
+			//float SPSLF = FPSInput.count() / 100000.0f;
+			float SPSLF = _SPLSLF;
 			win.GetHeight(screenHeight);
 			win.GetWidth(screenWidth);
 			// TODO Part 4c
@@ -455,7 +455,7 @@ public:
 			}
 			// TODO Part 4c
 			matMath.InverseF(viewMat, viewMat);
-			prevTimeInput = currTime;
+			//prevTimeInput = currTime;
 		}
 	~Model()
 	{

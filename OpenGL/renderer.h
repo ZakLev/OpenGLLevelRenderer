@@ -159,7 +159,7 @@
 		//GW::MATH::GVECTORF lightColor = { 0.9f,0.9f,1,1 };
 		//GW::MATH::GVECTORF lightAmbient = { 0.25f,0.25f,0.35f,1 };
 		//float fov = G_DEGREE_TO_RADIAN_F(65.0f); float fNear = .1f; float fFar = 100.0f; float AR;
-		//std::chrono::steady_clock::time_point prevTime;
+		std::chrono::steady_clock::time_point prevTime;
 		//std::chrono::microseconds FPS;
 		//float ftheta = 0;
 		//// TODO: Part 2b
@@ -285,7 +285,7 @@
 				//	std::cout << errors << std::endl;
 				//}
 			//}
-				/*for (int i = 0; i < models.size(); i++)
+			/*	for (int i = 0; i < models.size(); i++)
 				{
 					if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
 						models[i]->UploadModelDataToGPU(win,ogl);
@@ -301,8 +301,13 @@
 		}
 		void Render()
 		{
+
 			//models[0]->DrawModel();
-			models[1]->UpdateCamera();
+			//	//Get Delta Time
+			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
+			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
+			prevTime = currTime;
+			models[1]->UpdateCamera(deltaTime);
 			models[1]->DrawModel();
 			/*for (int i = 0; i < models.size();i++)
 			{
