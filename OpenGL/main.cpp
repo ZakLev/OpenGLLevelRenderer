@@ -30,12 +30,12 @@ int main()
 	GOpenGLSurface ogl;
 	FileIO readFile;
     LevelData data;
-	std::vector<Model*> models = {};
+	//std::vector<Model*> models = {};
 	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
-	readFile.ReadGameLevel(models);
+	//readFile.ReadGameLevel(models);
 	/*Renderer renderer;
 	renderer.transferData(models);*/
-	getModels(models);
+	//getModels(models);
 	
 	//renderer.data(data);
 	//H2B::Parser parser;

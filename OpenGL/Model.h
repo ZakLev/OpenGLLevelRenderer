@@ -118,6 +118,15 @@ Pixel = vec4(diffuse,1);
 //Pixel = vec4(diffuse,1) * color;
 }
 )";
+// Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
+#ifndef NDEBUG
+	void MessageCallback(	GLenum source, GLenum type, GLuint id,
+							GLenum severity, GLsizei length,
+							const GLchar* message, const void* userParam) {
+		fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+	}
+#endif
 
 class Model 
 {
@@ -227,10 +236,10 @@ public:
 			// Link Needed OpenGL API functions
 			LoadExtensions();
 			// In debug mode we link openGL errors to the console
-	//#ifndef NDEBUG
-	//		glEnable(GL_DEBUG_OUTPUT);
-	//		glDebugMessageCallback(MessageCallback, 0);
-	//#endif
+	#ifndef NDEBUG
+			glEnable(GL_DEBUG_OUTPUT);
+			glDebugMessageCallback(MessageCallback, 0);
+	#endif
 
 
 			glGenVertexArrays(1, &vertexArray);
@@ -242,7 +251,7 @@ public:
 			// TODO: Part 1g
 			glGenBuffers(1, &indiciesBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * parser.indices.size(), parser.indices.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * parser.indices.size(), parser.indices.data(), GL_STATIC_DRAW);
 			// TODO: Part 2c
 			glGenBuffers(1, &uboBuffer);
 			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
@@ -460,6 +469,9 @@ public:
 	~Model()
 	{
 		// free resources
+		if (vertexArray != NULL)
+		{
+
 		glDeleteVertexArrays(1, &vertexArray);
 		glDeleteBuffers(1, &vertexBufferObject);
 		// TODO: Part 1g
@@ -469,6 +481,7 @@ public:
 		glDeleteProgram(shaderExecutable);
 		// TODO: Part 2c
 		glDeleteBuffers(1, &uboBuffer);
+		}
 		
 	}
 

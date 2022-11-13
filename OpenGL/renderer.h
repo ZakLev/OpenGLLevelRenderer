@@ -5,6 +5,7 @@
 #include "h2bParser.h"
 #include <vector>
 #include "Model.h"
+#include "FileIO.h"
 //// Simple Vertex Shader
 //const char* vertexShaderSource = R"(
 //#version 330 // GLSL 3.30
@@ -125,12 +126,26 @@
 //	}
 //#endif
 	//LevelData lvlData;
-	std::vector<Model*> models;
-	void getModels(std::vector<Model*>& modelsData)
-	{
 
-		models = modelsData;
-	}
+//std::vector<Model*> models = {};
+	
+	//void getModels(std::vector<Model*>& modelsData)
+	//{
+	////models.resize(modelsData.size());
+	//	/*models.reserve(modelsData.size());
+	//	for each (Model* m in modelsData)
+	//	{
+	//		
+	//		models.push_back(m);
+	//	}
+	//	models.shrink_to_fit();*/
+	//	/*for (int i = 0; i < modelsData.size(); i++)
+	//	{
+	//		models.resize(i + 1);
+	//		models[i] = modelsData[i];
+	//}*/
+	//	//models = modelsData;
+	//}
 // Creation, Rendering & Cleanup
 	class Renderer
 	{
@@ -140,6 +155,9 @@
 		// proxy handles
 		GW::SYSTEM::GWindow win;
 		GW::GRAPHICS::GOpenGLSurface ogl;
+		FileIO readFile;
+		//std::vector<Model*> models = {};
+		std::vector<Model> models = {};
 		//// what we need at a minimum to draw a triangle
 		//GLuint vertexArray = 0;
 		//GLuint vertexBufferObject = 0;
@@ -188,6 +206,7 @@
 
 				win = _win;
 				ogl = _ogl;
+				readFile.ReadGameLevel(models);
 			//	// TODO: part 2a
 
 			//	matMath.Create();
@@ -290,13 +309,15 @@
 					if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
 						models[i]->UploadModelDataToGPU(win,ogl);
 				}*/
-				/*for each (Model* m in models)
+				/*for each (Model m in models)
 				{
-					m->UploadModelDataToGPU(win, ogl);
+					m.UploadModelDataToGPU(win, ogl);
 				}*/
+
 //models[0]->UploadModelDataToGPU(win, ogl);
 
-               models[1]->UploadModelDataToGPU(win, ogl);
+            //  models[1]->UploadModelDataToGPU(win, ogl);
+			   models[1].UploadModelDataToGPU(win, ogl);
 
 		}
 		void Render()
@@ -307,8 +328,10 @@
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
 			prevTime = currTime;
-			models[1]->UpdateCamera(deltaTime);
-			models[1]->DrawModel();
+			/*models[1]->UpdateCamera(deltaTime);
+			models[1]->DrawModel();*/
+			models[1].UpdateCamera(deltaTime);
+			models[1].DrawModel();
 			/*for (int i = 0; i < models.size();i++)
 			{
 				if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
@@ -316,11 +339,11 @@
 			}*/
 			/*for each (Model * m in models)
 			{
-				m->UpdateCamera();
+				m->UpdateCamera(deltaTime);
 			}*/
-			/*for each (Model* m in models)
+			/*for each (Model m in models)
 			{
-				m->DrawModel();
+				m.DrawModel();
 			}*/
 		//	int cm = 1;
 		//	//Get Delta Time
