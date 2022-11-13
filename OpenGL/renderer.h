@@ -317,7 +317,11 @@
 //models[0]->UploadModelDataToGPU(win, ogl);
 
             //  models[1]->UploadModelDataToGPU(win, ogl);
-			   models[1].UploadModelDataToGPU(win, ogl);
+			/*   models[1].UploadModelDataToGPU(win, ogl);*/
+               /*  for (int i = 0; i < models.size(); i++)
+                 {
+					 models[i].UploadModelDataToGPU(win,ogl);
+				 }*/
 
 		}
 		void Render()
@@ -332,6 +336,10 @@
 			models[1]->DrawModel();*/
 			models[1].UpdateCamera(deltaTime);
 			models[1].DrawModel();
+		/*	for (int i = 0; i < models.size(); i++)
+			{
+				models[i].UploadModelDataToGPU(win, ogl);
+			}*/
 			/*for (int i = 0; i < models.size();i++)
 			{
 				if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
