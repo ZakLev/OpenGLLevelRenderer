@@ -317,7 +317,7 @@
 //models[0]->UploadModelDataToGPU(win, ogl);
 
             //  models[1]->UploadModelDataToGPU(win, ogl);
-			/*   models[1].UploadModelDataToGPU(win, ogl);*/
+			   models[1].UploadModelDataToGPU(win, ogl);
                /*  for (int i = 0; i < models.size(); i++)
                  {
 					 models[i].UploadModelDataToGPU(win,ogl);
