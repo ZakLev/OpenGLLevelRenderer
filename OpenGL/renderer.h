@@ -317,8 +317,8 @@
 //models[0]->UploadModelDataToGPU(win, ogl);
 
             //  models[1]->UploadModelDataToGPU(win, ogl);
-			   models[1].UploadModelDataToGPU(win, ogl);
-               /*  for (int i = 0; i < models.size(); i++)
+			   models[7].UploadModelDataToGPU(win, ogl);
+                /* for (int i = 0; i < models.size(); i++)
                  {
 					 models[i].UploadModelDataToGPU(win,ogl);
 				 }*/
@@ -334,11 +334,11 @@
 			prevTime = currTime;
 			/*models[1]->UpdateCamera(deltaTime);
 			models[1]->DrawModel();*/
-			models[1].UpdateCamera(deltaTime);
-			models[1].DrawModel();
-		/*	for (int i = 0; i < models.size(); i++)
+			models[7].UpdateCamera(deltaTime);
+			models[7].DrawModel();
+			/*for (int i = 0; i < models.size(); i++)
 			{
-				models[i].UploadModelDataToGPU(win, ogl);
+				models[i].DrawModel();
 			}*/
 			/*for (int i = 0; i < models.size();i++)
 			{
