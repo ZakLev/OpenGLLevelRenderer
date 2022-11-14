@@ -68,7 +68,7 @@ int main()
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				//renderer.UpdateCamera();
+				renderer.UpdateCamera();
 				renderer.Render();
 				ogl.UniversalSwapBuffers();
 			}

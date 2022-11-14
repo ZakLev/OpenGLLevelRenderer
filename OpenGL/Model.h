@@ -140,11 +140,11 @@ class Model
 	GLuint vertexBufferObject = 0;
 	// TODO: Part 1g
 	GLuint indiciesBuffer = 0;
-	GLuint vertexShader = 0;
-	GLuint fragmentShader = 0;
-	GLuint shaderExecutable = 0;
+	//GLuint vertexShader = 0;
+	//GLuint fragmentShader = 0;
+	//GLuint shaderExecutable = 0;
 	// TODO: Part 2c
-	GLuint uboBuffer = 0;
+	//GLuint uboBuffer = 0;
 	// TODO: Part 2a
 	GW::MATH::GMatrix matMath;
 	GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
@@ -193,33 +193,33 @@ public:
 			win = _win;
 			ogl = _ogl;
 			// TODO: part 2a
-			GIn.Create(win);
-			GCon.Create();
+			/*GIn.Create(win);
+			GCon.Create();*/
 			matMath.Create();
-			win.GetHeight(screenHeight);
-			win.GetWidth(screenWidth);
+		//	win.GetHeight(screenHeight);
+		//	win.GetWidth(screenWidth);
 			//World
 		//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
-			//Camera
-			GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
-			GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
-			GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
-			//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
-				/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
-				matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
+			////Camera
+			//GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
+			//GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
+			//GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
+			////	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
+			//	/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
+			//	matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
 
-			matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
-			//matMath.InverseF(viewMat, viewMat);
-			//Projection
-			_ogl.GOpenGLSurface::GetAspectRatio(AR);
-			matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
+			//matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
+			////matMath.InverseF(viewMat, viewMat);
+			////Projection
+			//_ogl.GOpenGLSurface::GetAspectRatio(AR);
+			//matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
 
 			// TODO: Part 2b
 
 			UBO.sunDirection = lightDir;
 			UBO.sunColor = lightColor;
-			UBO.viewMatrix = viewMat;
-			UBO.projectionMatrix = projMat;
+		//	UBO.viewMatrix = viewMat;
+		//	UBO.projectionMatrix = projMat;
 			UBO.world = worldMat;
 			OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&parser.materials[0].attrib;
 			UBO.material = *obj;
@@ -228,7 +228,7 @@ public:
 
 			// TODO: Part 4e
 			UBO.sunAmbient = lightAmbient;
-			UBO.camPos = cameraPos;
+		//	UBO.camPos = cameraPos;
 
 
 
@@ -252,56 +252,56 @@ public:
 			glGenBuffers(1, &indiciesBuffer);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * parser.indices.size(), parser.indices.data(), GL_STATIC_DRAW);
-			// TODO: Part 2c
-			glGenBuffers(1, &uboBuffer);
-			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-			glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+			//// TODO: Part 2c
+			//glGenBuffers(1, &uboBuffer);
 			//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			GLuint binding_point_index = 0;
-			glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-			GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-			memcpy(p, &UBO, sizeof(UBO));
-			glUnmapBuffer(GL_UNIFORM_BUFFER);
+			//glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
+			//glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-			// Create Vertex Shader
-			vertexShader = glCreateShader(GL_VERTEX_SHADER);
-			glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-			glCompileShader(vertexShader);
-			char errors[1024]; GLint result;
-			glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
-			if (result == false)
-			{
-				glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
-			// Create Fragment Shader
-			fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-			glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-			glCompileShader(fragmentShader);
-			glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
-			if (result == false)
-			{
-				glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
-			// Create Executable Shader Program
-			shaderExecutable = glCreateProgram();
-			glAttachShader(shaderExecutable, vertexShader);
-			glAttachShader(shaderExecutable, fragmentShader);
-			glLinkProgram(shaderExecutable);
-			glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
-			if (result == false)
-			{
-				glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
-				std::cout << errors << std::endl;
-			}
+			////glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+			//GLuint binding_point_index = 0;
+			//glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+			//GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+			//memcpy(p, &UBO, sizeof(UBO));
+			//glUnmapBuffer(GL_UNIFORM_BUFFER);
+
+			//// Create Vertex Shader
+			//vertexShader = glCreateShader(GL_VERTEX_SHADER);
+			//glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+			//glCompileShader(vertexShader);
+			//char errors[1024]; GLint result;
+			//glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
+			//if (result == false)
+			//{
+			//	glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
+			//	std::cout << errors << std::endl;
+			//}
+			//// Create Fragment Shader
+			//fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+			//glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+			//glCompileShader(fragmentShader);
+			//glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
+			//if (result == false)
+			//{
+			//	glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
+			//	std::cout << errors << std::endl;
+			//}
+			//// Create Executable Shader Program
+			//shaderExecutable = glCreateProgram();
+			//glAttachShader(shaderExecutable, vertexShader);
+			//glAttachShader(shaderExecutable, fragmentShader);
+			//glLinkProgram(shaderExecutable);
+			//glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
+			//if (result == false)
+			//{
+			//	glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
+			//	std::cout << errors << std::endl;
+			//}
 			return 0;
 		}
-		void DrawModel()
+		void DrawModel(GLuint shaderExecutable,GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat,GLuint uboBuffer )
 		{
-
+			
 			//int cm = 1;
 			//Get Delta Time
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
@@ -316,7 +316,8 @@ public:
 
 				// setup the pipeline
 				//World
-			
+			UBO.viewMatrix = viewMat;
+				UBO.projectionMatrix = projMat;
 			GLint locationW = glGetUniformLocation(shaderExecutable, "world");
 			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
 			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
@@ -398,74 +399,75 @@ public:
 			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
 				//glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
 				glDrawElements(GL_TRIANGLES, parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * parser.batches[i].indexOffset));
+				
 				/*}
 					}*/
 					// some video cards(cough Intel) need this set back to zero or they won't display
 			}
 			glBindVertexArray(0);
 		}
-		void UpdateCamera(float _SPLSLF)
-		{
+		//void UpdateCamera(float _SPLSLF)
+		//{
 
-			//std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
-			//FPSInput = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTimeInput);
-			//float SPSLF = FPSInput.count() / 100000.0f;
-			float SPSLF = _SPLSLF;
-			win.GetHeight(screenHeight);
-			win.GetWidth(screenWidth);
-			// TODO Part 4c
-			matMath.InverseF(viewMat, viewMat);
-			// TODO: Part 4d
-			float yChange = 0.0f; float yChangeCon = 0.0f; float yChangeNeg = 0.0f; float yChangeNegCon = 0.0f;
-			const float cameraSpeed = 0.3f;
-			GIn.GetState(G_KEY_SPACE, yChange);
-			//int d = 0;
-			//GCon.GetNumConnected(d);
-			//printf("%S \n", d);
-			GCon.GetState(0, G_RIGHT_TRIGGER_AXIS, yChangeCon);
-			GIn.GetState(G_KEY_LEFTSHIFT, yChangeNeg);
-			GCon.GetState(0, G_LEFT_TRIGGER_AXIS, yChangeNegCon);
-			/*if (yChange > cameraSpeed)
-				yChange = 0.3f;*/
-			viewMat.row4.y += ((yChange - yChangeNeg) + (yChangeCon - yChangeNegCon)) * cameraSpeed * SPSLF;
+		//	//std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
+		//	//FPSInput = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTimeInput);
+		//	//float SPSLF = FPSInput.count() / 100000.0f;
+		//	float SPSLF = _SPLSLF;
+		//	win.GetHeight(screenHeight);
+		//	win.GetWidth(screenWidth);
+		//	// TODO Part 4c
+		//	matMath.InverseF(viewMat, viewMat);
+		//	// TODO: Part 4d
+		//	float yChange = 0.0f; float yChangeCon = 0.0f; float yChangeNeg = 0.0f; float yChangeNegCon = 0.0f;
+		//	const float cameraSpeed = 0.3f;
+		//	GIn.GetState(G_KEY_SPACE, yChange);
+		//	//int d = 0;
+		//	//GCon.GetNumConnected(d);
+		//	//printf("%S \n", d);
+		//	GCon.GetState(0, G_RIGHT_TRIGGER_AXIS, yChangeCon);
+		//	GIn.GetState(G_KEY_LEFTSHIFT, yChangeNeg);
+		//	GCon.GetState(0, G_LEFT_TRIGGER_AXIS, yChangeNegCon);
+		//	/*if (yChange > cameraSpeed)
+		//		yChange = 0.3f;*/
+		//	viewMat.row4.y += ((yChange - yChangeNeg) + (yChangeCon - yChangeNegCon)) * cameraSpeed * SPSLF;
 
-			// TODO: Part 4e
-			float zChange = 0.0f; float zChangeNeg = 0.0f; float xChange = 0.0f; float xChangeNeg = 0.0f;
-			float zChangeCon = 0.0f; float xChangeCon = 0.0f;
-			GIn.GetState(G_KEY_D, xChange);
-			GIn.GetState(G_KEY_A, xChangeNeg);
-			GIn.GetState(G_KEY_S, zChange);
-			GIn.GetState(G_KEY_W, zChangeNeg);
-			GCon.GetState(0, G_LY_AXIS, zChangeCon);
-			GCon.GetState(0, G_LX_AXIS, xChangeCon);
+		//	// TODO: Part 4e
+		//	float zChange = 0.0f; float zChangeNeg = 0.0f; float xChange = 0.0f; float xChangeNeg = 0.0f;
+		//	float zChangeCon = 0.0f; float xChangeCon = 0.0f;
+		//	GIn.GetState(G_KEY_D, xChange);
+		//	GIn.GetState(G_KEY_A, xChangeNeg);
+		//	GIn.GetState(G_KEY_S, zChange);
+		//	GIn.GetState(G_KEY_W, zChangeNeg);
+		//	GCon.GetState(0, G_LY_AXIS, zChangeCon);
+		//	GCon.GetState(0, G_LX_AXIS, xChangeCon);
 
-			GW::MATH::GVECTORF translationVec = { ((xChange - xChangeNeg) + xChangeCon) * cameraSpeed * SPSLF, 0.0f, ((zChange - zChangeNeg) + zChangeCon) * cameraSpeed * SPSLF, 0.0f };
-			matMath.TranslateLocalF(viewMat, translationVec, viewMat);
-			// TODO: Part 4f 
-			float speed = 3.14159f * SPSLF * 25.0f; float mouseYChange = 0.0f; float mouseXChange = 0.0f; float conYChange = 0.0f; float conXChange = 0.0f;
-			auto res = GIn.GetMouseDelta(mouseXChange, mouseYChange);
-			GCon.GetState(0, G_RY_AXIS, yChangeCon);
-			GCon.GetState(0, G_RX_AXIS, xChangeCon);
-			//GIn.GetMouseDelta(mouseYChange);
-			if (G_PASS(res) && res != GW::GReturn::REDUNDANT)
-			{
-				float totalPitch = fov * ((mouseYChange / screenHeight) + conYChange) * -speed;
-				GW::MATH::GMATRIXF pitchMatrix = GW::MATH::GIdentityMatrixF;
-				//matMath.RotationYawPitchRollF(0.0f, -totalPitch, 0.0f, pitchMatrix);
-				GW::MATH::GMATRIXF CameraSave = viewMat;
-				matMath.RotateXLocalF(viewMat, totalPitch, viewMat);
-				// matMath.MultiplyMatrixF(viewMat4x4,pitchMatrix,viewMat4x4);
-				// TODO: Part 4g
-				float totalYaw = fov * AR * ((mouseXChange / screenWidth) + conXChange) * (speed);
-				GW::MATH::GMATRIXF yawMatrix = GW::MATH::GIdentityMatrixF;
-				matMath.RotationYawPitchRollF(-totalYaw, 0.0f, 0.0f, yawMatrix);
-				matMath.MultiplyMatrixF(viewMat, yawMatrix, viewMat);
-				viewMat.row4 = CameraSave.row4;
-			}
-			// TODO Part 4c
-			matMath.InverseF(viewMat, viewMat);
-			//prevTimeInput = currTime;
-		}
+		//	GW::MATH::GVECTORF translationVec = { ((xChange - xChangeNeg) + xChangeCon) * cameraSpeed * SPSLF, 0.0f, ((zChange - zChangeNeg) + zChangeCon) * cameraSpeed * SPSLF, 0.0f };
+		//	matMath.TranslateLocalF(viewMat, translationVec, viewMat);
+		//	// TODO: Part 4f 
+		//	float speed = 3.14159f * SPSLF * 25.0f; float mouseYChange = 0.0f; float mouseXChange = 0.0f; float conYChange = 0.0f; float conXChange = 0.0f;
+		//	auto res = GIn.GetMouseDelta(mouseXChange, mouseYChange);
+		//	GCon.GetState(0, G_RY_AXIS, yChangeCon);
+		//	GCon.GetState(0, G_RX_AXIS, xChangeCon);
+		//	//GIn.GetMouseDelta(mouseYChange);
+		//	if (G_PASS(res) && res != GW::GReturn::REDUNDANT)
+		//	{
+		//		float totalPitch = fov * ((mouseYChange / screenHeight) + conYChange) * -speed;
+		//		GW::MATH::GMATRIXF pitchMatrix = GW::MATH::GIdentityMatrixF;
+		//		//matMath.RotationYawPitchRollF(0.0f, -totalPitch, 0.0f, pitchMatrix);
+		//		GW::MATH::GMATRIXF CameraSave = viewMat;
+		//		matMath.RotateXLocalF(viewMat, totalPitch, viewMat);
+		//		// matMath.MultiplyMatrixF(viewMat4x4,pitchMatrix,viewMat4x4);
+		//		// TODO: Part 4g
+		//		float totalYaw = fov * AR * ((mouseXChange / screenWidth) + conXChange) * (speed);
+		//		GW::MATH::GMATRIXF yawMatrix = GW::MATH::GIdentityMatrixF;
+		//		matMath.RotationYawPitchRollF(-totalYaw, 0.0f, 0.0f, yawMatrix);
+		//		matMath.MultiplyMatrixF(viewMat, yawMatrix, viewMat);
+		//		viewMat.row4 = CameraSave.row4;
+		//	}
+		//	// TODO Part 4c
+		//	matMath.InverseF(viewMat, viewMat);
+		//	//prevTimeInput = currTime;
+		//}
 	~Model()
 	{
 		// free resources
@@ -476,11 +478,11 @@ public:
 		glDeleteBuffers(1, &vertexBufferObject);
 		// TODO: Part 1g
 		glDeleteBuffers(1, &indiciesBuffer);
-		glDeleteShader(vertexShader);
+		/*glDeleteShader(vertexShader);
 		glDeleteShader(fragmentShader);
-		glDeleteProgram(shaderExecutable);
+		glDeleteProgram(shaderExecutable);*/
 		// TODO: Part 2c
-		glDeleteBuffers(1, &uboBuffer);
+		//glDeleteBuffers(1, &uboBuffer);
 		}
 		
 	}
