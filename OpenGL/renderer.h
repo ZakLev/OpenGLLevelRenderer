@@ -701,7 +701,7 @@ void main()
 
 			models = modelsData;
 		}*/
-		void UpdateCamera(bool& changeLevel,char*& fileName)
+		void UpdateCamera(bool& changeLevel,char*& fileName, bool& playSound)
 		{
 
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
@@ -710,6 +710,7 @@ void main()
 			//float SPSLF = _SPLSLF;
 			float levelChange2 = 0;
 			float levelChange1 = 0;
+			float playAug = 0;
 			GIn.GetState(G_KEY_4, levelChange2);
 			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
 			{
@@ -724,6 +725,13 @@ void main()
 				fileName = "../../Assets/GameLevel.txt";
 				changeLevel = true;
 				
+			}
+			GIn.GetState(G_KEY_1, playAug);
+			if (playAug != 0 && playSound == false)
+			{
+				playSound = true;
+				playAug = 0;
+
 			}
 			win.GetHeight(screenHeight);
 			win.GetWidth(screenWidth);

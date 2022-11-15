@@ -33,11 +33,15 @@ int main()
 	GEventResponder msgs;
 	GOpenGLSurface ogl;
 	bool changeLevel = false;
+	bool playSound = false;
+	bool soundOver = false;
 	int level = 0;
 	char* filePath = "../../Assets/GameLevel.txt";
 	char* musicPath = "../../Assets/Music/OOOF.wav";
+	char* soundPath = "../../Assets/Sound/AUG.wav";
 	GW::AUDIO::GMusic song;
 	GW::AUDIO::GAudio aud;
+	GW::AUDIO::GSound sou;
 	//FileIO readFile;
    // LevelData data;
 	//std::vector<Model*> models = {};
@@ -82,6 +86,7 @@ int main()
 			{
 				aud.Create();
 				song.Create(musicPath, aud, 1.0f);
+				sou.Create(soundPath,aud,1.0f);
 				song.Play(true);
 				aud.PlayMusic();
 			}
@@ -92,9 +97,21 @@ int main()
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				renderer.UpdateCamera(changeLevel, filePath);
+				renderer.UpdateCamera(changeLevel, filePath, playSound);
 				if (changeLevel)
 					break;
+				if (playSound && !soundOver)
+				{
+					aud.PlaySounds();
+					song.Pause();
+				}
+				sou.isPlaying(soundOver);
+				if (!soundOver && playSound)
+				{
+					song.Resume();
+					playSound = false;
+				}
+				
 				renderer.Render();
 				ogl.UniversalSwapBuffers();
 			}
