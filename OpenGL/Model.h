@@ -142,7 +142,7 @@ class Model
 	//GLuint fragmentShader = 0;
 	//GLuint shaderExecutable = 0;
 	// TODO: Part 2c
-	//GLuint uboBuffer = 0;
+	GLuint uboBuffer = 0;
 	// TODO: Part 2a
 	//GW::MATH::GMatrix matMath;
 	GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
@@ -199,7 +199,7 @@ public:
 			//World
 		//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
 			////Camera
-			//GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
+			GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
 			//GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
 			//GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
 			////	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
@@ -228,7 +228,7 @@ public:
 
 			// TODO: Part 4e
 			UBO.sunAmbient = lightAmbient;
-		//	UBO.camPos = cameraPos;
+			UBO.camPos = cameraPos;
 
 
 
@@ -253,17 +253,17 @@ public:
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
 			glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * parser.indices.size(), parser.indices.data(), GL_STATIC_DRAW);
 			//// TODO: Part 2c
-			//glGenBuffers(1, &uboBuffer);
-			//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			//glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-			//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+			glGenBuffers(1, &uboBuffer);
+			glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+			glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
+			glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-			////glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-			//GLuint binding_point_index = 0;
-			//glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-			//GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-			//memcpy(p, &UBO, sizeof(UBO));
-			//glUnmapBuffer(GL_UNIFORM_BUFFER);
+			//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+			GLuint binding_point_index = 0;
+			glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+			GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+			memcpy(p, &UBO, sizeof(UBO));
+			glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 			//// Create Vertex Shader
 			//vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -299,7 +299,7 @@ public:
 			//}
 			return 0;
 		}
-		void DrawModel(GLuint shaderExecutable,GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat,GLuint uboBuffer )
+		void DrawModel(GLuint shaderExecutable,GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat )
 		{
 			
 			//int cm = 1;
@@ -482,7 +482,7 @@ public:
 		glDeleteShader(fragmentShader);
 		glDeleteProgram(shaderExecutable);*/
 		// TODO: Part 2c
-		//glDeleteBuffers(1, &uboBuffer);
+		glDeleteBuffers(1, &uboBuffer);
 		}
 		
 	}

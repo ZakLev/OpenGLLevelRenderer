@@ -216,7 +216,7 @@ void main()
 		GLuint fragmentShader = 0;
 		GLuint shaderExecutable = 0;
 		//// TODO: Part 2c
-		GLuint uboBuffer = 0;
+		//GLuint uboBuffer = 0;
 		//skybox
 		GLuint skyboxVAO = 0;
 		GLuint skyboxVBO = 0;
@@ -381,17 +381,17 @@ void main()
 				   models[i].UploadModelDataToGPU(win,ogl);
 			   }
 
-				glGenBuffers(1, &uboBuffer);
-				glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-				glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-				glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
+				//glGenBuffers(1, &uboBuffer);
 				//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-				GLuint binding_point_index = 0;
-				glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-				GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-				memcpy(p, &UBO, sizeof(UBO));
-				glUnmapBuffer(GL_UNIFORM_BUFFER);
+				//glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
+				//glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
+				////glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
+				//GLuint binding_point_index = 0;
+				//glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
+				//GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
+				//memcpy(p, &UBO, sizeof(UBO));
+				//glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 				// Create Vertex Shader
 				vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -519,7 +519,7 @@ void main()
 			//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
 			for (int i = 0; i < models.size(); i++)
 			{
-				models[i].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
+				models[i].DrawModel(shaderExecutable, viewMat, projMat);
 			}
 
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -797,7 +797,7 @@ void main()
 			glDeleteProgram(shaderExecutable);
 		
 			//// TODO: Part 2c
-			glDeleteBuffers(1, &uboBuffer);
+			//glDeleteBuffers(1, &uboBuffer);
 
 			//skymap
 			glDeleteVertexArrays(1, &skyboxVAO);

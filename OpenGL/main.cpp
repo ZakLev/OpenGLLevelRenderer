@@ -75,12 +75,6 @@ int main()
 		std::string musicPath = "../../Assets/Music/OOOF.mp3";
 		aud.Create();
 		song.Create(musicPath.c_str(), aud, 1.0f);
-	//	int channel;
-		//song.GetOutputChannels(channel);
-		//song.GetSourceChannels();
-		aud.SetMasterVolume(1.0f);
-		aud.SetGlobalMusicVolume(1.0f);
-		aud.SetGlobalSoundVolume(1.0f);
 		song.Play(true);
 		aud.PlayMusic();
 		}
