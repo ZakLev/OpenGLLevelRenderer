@@ -6,125 +6,167 @@
 #include <vector>
 #include "Model.h"
 #include "FileIO.h"
-//// Simple Vertex Shader
-//const char* vertexShaderSource = R"(
-//#version 330 // GLSL 3.30
-//// an ultra simple glsl vertex shader
-//// TODO: Part 2b
-//struct OBJ_ATTRIBUTES
-//{
-//	vec3    Kd; // diffuse reflectivity
-//	float	    d; // dissolve (transparency) 
-//	vec3    Ks; // specular reflectivity
-//	float       Ns; // specular exponent
-//	vec3    Ka; // ambient reflectivity
-//	float       sharpness; // local reflection map sharpness
-//	vec3    Tf; // transmission filter
-//	float       Ni; // optical density (index of refraction)
-//	vec3    Ke; // emissive reflectivity
-//	uint    illum; // illumination model
-//};
-//
-//// The following GLSL syntax specefies a uniform buffer
-//// where the matricies contained within are row major.
-//layout(row_major) uniform UBO_DATA
-//{
-//    vec4 sunDirection, sunColor;
-//    mat4 viewMatrix, projectionMatrix;
-//    mat4 world;
-//    OBJ_ATTRIBUTES material;
-//    vec4 sunAmbient, camPos;
-//};
-//// TODO: Part 4e
-//// TODO: Part 1f
-//// TODO: Part 4a
-//layout(location = 0) in vec3 local_pos;
-//layout(location = 1) in vec3 local_uvw;
-//layout(location = 2) in vec3 local_nrm;
-//out vec3 world_nrm;
-//out vec3 worldPos;
-//void main()
-//{
-//	// TODO: Part 1f
-//	//gl_Position = vec4(local_pos, 1);
-////gl_UVs = vec3(UV);
-////gl_Norm = vec3(Norm);
-//	// TODO: Part 1h
-////gl_Position.y -= 0.75;
-//	// TODO: Part 2h
-//vec4 pos4 = vec4(local_pos, 1);
-// vec4 positionW = pos4 * world;
-// vec4 positionV = positionW* viewMatrix;
-// vec4 position = positionV* projectionMatrix;
-//gl_Position = vec4(position);
-//worldPos = vec3(positionW);
-//	// TODO: Part 4b
-//	vec3 nrm = vec3(vec4(local_nrm, 0.0) * world);
-//    world_nrm = nrm;
-//}
-//)";
-//// Simple Fragment Shader
-//const char* fragmentShaderSource = R"(
-//#version 330 // GLSL 3.30
-//out vec4 Pixel;
-//// an ultra simple glsl fragment shader
-//// TODO: Part 3a
-//struct OBJ_ATTRIBUTES
-//{
-//	vec3    Kd; // diffuse reflectivity
-//	float	    d; // dissolve (transparency) 
-//	vec3    Ks; // specular reflectivity
-//	float       Ns; // specular exponent
-//	vec3    Ka; // ambient reflectivity
-//	float       sharpness; // local reflection map sharpness
-//	vec3    Tf; // transmission filter
-//	float       Ni; // optical density (index of refraction)
-//	vec3    Ke; // emissive reflectivity
-//	uint    illum; // illumination model
-//};
-//
-//// The following GLSL syntax specefies a uniform buffer
-//// where the matricies contained within are row major.
-//layout(row_major) uniform UBO_DATA
-//{
-//    vec4 sunDirection, sunColor;
-//    mat4 viewMatrix, projectionMatrix;
-//    mat4 world;
-//    OBJ_ATTRIBUTES material;
-//    vec4 sunAmbient, camPos;
-//};
-//// TODO: Part 4e
-//// TODO: Part 4b
-//in vec3 world_nrm;
-//in vec3 worldPos;
-//void main() 
-//{	
-//	// TODO: Part 3a
-//	//Pixel = vec4(170/255.0f, 170/255.0f, 44/255.0f, 1); // TODO: Part 1a
-//    vec4 color = vec4(material.Kd,1);
-//vec3 nrm = normalize(world_nrm);
-//float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
-//	// TODO: Part 4e
-//	// TODO: Part 4f (half-vector or reflect method)
-//     vec3 reflectDir = reflect(normalize(sunDirection.xyz), nrm);
-//vec3 posW = vec3(worldPos.x,worldPos.y,worldPos.z);
-//vec3 camDir = normalize(camPos.xyz - posW.xyz );
-//      float spec = pow(max(dot(camDir, reflectDir), 0.0), material.Ns);
-//vec3 specular = spec * material.Ks;
-//vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
-//Pixel = vec4(diffuse,1);
-////Pixel = vec4(diffuse,1) * color;
-//}
-//)";
+// Simple Vertex Shader
+const char* vertexShaderSource = R"(
+#version 330 // GLSL 3.30
+// an ultra simple glsl vertex shader
+// TODO: Part 2b
+struct OBJ_ATTRIBUTES
+{
+	vec3    Kd; // diffuse reflectivity
+	float	    d; // dissolve (transparency) 
+	vec3    Ks; // specular reflectivity
+	float       Ns; // specular exponent
+	vec3    Ka; // ambient reflectivity
+	float       sharpness; // local reflection map sharpness
+	vec3    Tf; // transmission filter
+	float       Ni; // optical density (index of refraction)
+	vec3    Ke; // emissive reflectivity
+	uint    illum; // illumination model
+};
+
+// The following GLSL syntax specefies a uniform buffer
+// where the matricies contained within are row major.
+layout(row_major) uniform UBO_DATA
+{
+    vec4 sunDirection, sunColor;
+    mat4 viewMatrix, projectionMatrix;
+    mat4 world;
+    OBJ_ATTRIBUTES material;
+    vec4 sunAmbient, camPos;
+};
+// TODO: Part 4e
+// TODO: Part 1f
+// TODO: Part 4a
+layout(location = 0) in vec3 local_pos;
+layout(location = 1) in vec3 local_uvw;
+layout(location = 2) in vec3 local_nrm;
+
+out vec3 world_nrm;
+out vec3 worldPos;
+//out vec3 TexCoords;
+
+void main()
+{
+	// TODO: Part 1f
+	//gl_Position = vec4(local_pos, 1);
+//gl_UVs = vec3(UV);
+//gl_Norm = vec3(Norm);
+	// TODO: Part 1h
+//gl_Position.y -= 0.75;
+	// TODO: Part 2h
+vec4 pos4 = vec4(local_pos, 1);
+ vec4 positionW = pos4 * world;
+ vec4 positionV = positionW* viewMatrix;
+ vec4 position = positionV* projectionMatrix;
+gl_Position = vec4(position);
+worldPos = vec3(positionW);
+	// TODO: Part 4b
+	vec3 nrm = vec3(vec4(local_nrm, 0.0) * world);
+    world_nrm = nrm;
+//TexCoords = local_pos;
+}
+)";
+// Simple Fragment Shader
+const char* fragmentShaderSource = R"(
+#version 330 // GLSL 3.30
+out vec4 Pixel;
+// an ultra simple glsl fragment shader
+// TODO: Part 3a
+struct OBJ_ATTRIBUTES
+{
+	vec3    Kd; // diffuse reflectivity
+	float	    d; // dissolve (transparency) 
+	vec3    Ks; // specular reflectivity
+	float       Ns; // specular exponent
+	vec3    Ka; // ambient reflectivity
+	float       sharpness; // local reflection map sharpness
+	vec3    Tf; // transmission filter
+	float       Ni; // optical density (index of refraction)
+	vec3    Ke; // emissive reflectivity
+	uint    illum; // illumination model
+};
+
+// The following GLSL syntax specefies a uniform buffer
+// where the matricies contained within are row major.
+layout(row_major) uniform UBO_DATA
+{
+    vec4 sunDirection, sunColor;
+    mat4 viewMatrix, projectionMatrix;
+    mat4 world;
+    OBJ_ATTRIBUTES material;
+    vec4 sunAmbient, camPos;
+};
+
+
+
+
+// TODO: Part 4e
+// TODO: Part 4b
+in vec3 world_nrm;
+in vec3 worldPos;
+//out vec4 FragColor;
+
+//in vec3 TexCoords;
+//in vec3 textureDir; // direction vector representing a 3D texture coordinate
+//uniform samplerCube skybox; // cubemap texture sampler
+
+void main() 
+{	
+	// TODO: Part 3a
+	//Pixel = vec4(170/255.0f, 170/255.0f, 44/255.0f, 1); // TODO: Part 1a
+    vec4 color = vec4(material.Kd,1);
+vec3 nrm = normalize(world_nrm);
+float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
+	// TODO: Part 4e
+	// TODO: Part 4f (half-vector or reflect method)
+     vec3 reflectDir = reflect(normalize(sunDirection.xyz), nrm);
+vec3 posW = vec3(worldPos.x,worldPos.y,worldPos.z);
+vec3 camDir = normalize(camPos.xyz - posW.xyz );
+      float spec = pow(max(dot(camDir, reflectDir), 0.0), material.Ns);
+vec3 specular = spec * material.Ks;
+vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
+Pixel = vec4(diffuse,1);
+//Pixel = vec4(diffuse,1) * color;
+ //FragColor = texture(skybox, TexCoords);
+}
+)";
+const char* vertexShaderSkyboxSource = R"(
+#version 330 // GLSL 3.30
+	layout (location = 0) in vec3 aPos;
+
+	out vec3 TexCoords;
+
+	uniform mat4 projection;
+	uniform mat4 view;
+
+void main()
+{
+	TexCoords = aPos;
+	gl_Position = projection * mat4(mat3(view)) * vec4(aPos, 1.0);
+}
+)";
+const char* fragmentShaderSkyboxSource = R"(
+#version 330 // GLSL 3.30
+	out vec4 FragColor;
+
+	in vec3 TexCoords;
+
+	uniform samplerCube skybox;
+void main()
+{
+	FragColor = texture(skybox, TexCoords);
+}
+)";
 // Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
-//#ifndef NDEBUG
-//	void MessageCallback(	GLenum source, GLenum type, GLuint id,
-//							GLenum severity, GLsizei length,
-//							const GLchar* message, const void* userParam) {
-//		fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-//		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-//	}
-//#endif
+#ifndef NDEBUG
+	void MessageCallback(	GLenum source, GLenum type, GLuint id,
+							GLenum severity, GLsizei length,
+							const GLchar* message, const void* userParam) {
+		fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+	}
+#endif
 	//LevelData lvlData;
 
 //std::vector<Model*> models = {};
@@ -170,6 +212,14 @@
 		GLuint shaderExecutable = 0;
 		//// TODO: Part 2c
 		GLuint uboBuffer = 0;
+		//skybox
+		GLuint skyboxVAO = 0;
+		GLuint skyboxVBO = 0;
+		GLuint cubemapTexture;
+
+		GLuint vertexShaderSkybox = 0;
+		GLuint fragmentShaderSkybox = 0;
+		GLuint shaderExecutableSkybox = 0;
 		//// TODO: Part 2a
 		GW::MATH::GMatrix matMath;
 		//GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
@@ -196,7 +246,50 @@
 			GW::MATH::GVECTORF sunAmbient, camPos;
 		} UBO;
 		// TODO: Part 4e
+		float skyboxVertices[108] = {
+			// positions          
+			-1.0f,  1.0f, -1.0f,
+			-1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
 
+			-1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f, -1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+
+			-1.0f, -1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f,
+			-1.0f, -1.0f,  1.0f,
+
+			-1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f, -1.0f,
+			 1.0f,  1.0f,  1.0f,
+			 1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f,  1.0f,
+			-1.0f,  1.0f, -1.0f,
+
+			-1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f, -1.0f,
+			 1.0f, -1.0f, -1.0f,
+			-1.0f, -1.0f,  1.0f,
+			 1.0f, -1.0f,  1.0f
+		};
 	public:
 		//Level Data
 		 //LevelData lvlData;
@@ -211,6 +304,8 @@
 				win = _win;
 				ogl = _ogl;
 				readFile.ReadGameLevel(models);
+
+				
 			//	// TODO: part 2a
 
 			matMath.Create();
@@ -316,6 +411,67 @@
 					glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
 					std::cout << errors << std::endl;
 				}
+
+				// Create Vertex Shader Skybox
+				vertexShaderSkybox = glCreateShader(GL_VERTEX_SHADER);
+				glShaderSource(vertexShaderSkybox, 1, &vertexShaderSkyboxSource, NULL);
+				glCompileShader(vertexShaderSkybox);
+				char errorsSkybox[1024]; GLint resultSkybox;
+				glGetShaderiv(vertexShaderSkybox, GL_COMPILE_STATUS, &resultSkybox);
+				if (resultSkybox == false)
+				{
+					glGetShaderInfoLog(vertexShaderSkybox, 1024, NULL, errors);
+					std::cout << errorsSkybox << std::endl;
+				}
+				// Create Fragment Shader Skybox
+				fragmentShaderSkybox = glCreateShader(GL_FRAGMENT_SHADER);
+				glShaderSource(fragmentShaderSkybox, 1, &fragmentShaderSkyboxSource, NULL);
+				glCompileShader(fragmentShaderSkybox);
+				glGetShaderiv(fragmentShaderSkybox, GL_COMPILE_STATUS, &resultSkybox);
+				if (resultSkybox == false)
+				{
+					glGetShaderInfoLog(fragmentShaderSkybox, 1024, NULL, errorsSkybox);
+					std::cout << errorsSkybox << std::endl;
+				}
+				// Create Executable Shader Skybox Program
+				shaderExecutableSkybox = glCreateProgram();
+				glAttachShader(shaderExecutableSkybox, vertexShaderSkybox);
+				glAttachShader(shaderExecutableSkybox, fragmentShaderSkybox);
+				glLinkProgram(shaderExecutableSkybox);
+				glGetProgramiv(shaderExecutableSkybox, GL_LINK_STATUS, &resultSkybox);
+				if (resultSkybox == false)
+				{
+					glGetProgramInfoLog(shaderExecutableSkybox, 1024, NULL, errorsSkybox);
+					std::cout << errorsSkybox << std::endl;
+				}
+
+				std::vector<std::string> faces
+				{
+					"../../Assets/skybox/right.jpg",
+						"../../Assets/skybox/left.jpg",
+						"../../Assets/skybox/top.jpg",
+						"../../Assets/skybox/bottom.jpg",
+						"../../Assets/skybox/front.jpg",
+						"../../Assets/skybox/back.jpg"
+				};
+				 cubemapTexture = loadCubemap(faces);
+
+				// skybox VAO
+				/*unsigned int skyboxVAO, skyboxVBO;*/
+				
+				glGenVertexArrays(1, &skyboxVAO);
+				glGenBuffers(1, &skyboxVBO);
+				glBindVertexArray(skyboxVAO);
+				glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+				glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+				glEnableVertexAttribArray(0);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
+				
+				glUseProgram(shaderExecutableSkybox);
+				glUniform1i(glGetUniformLocation(shaderExecutableSkybox, "shader"), 0);
+				glUseProgram(shaderExecutableSkybox);
+			
+				
 			//}
 			/*	for (int i = 0; i < models.size(); i++)
 				{
@@ -351,7 +507,34 @@
 			{
 				models[i].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
 			}
+
+			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+			//skyboxShader.use();
+			/*GW::MATH::GVECTORF viewTran; 
+			matMath.GetTranslationF(viewMat,viewTran);
+			viewTran.x = viewTran.x * -1;
+			viewTran.y = viewTran.y * -1;
+			viewTran.z = viewTran.z * -1;*/
+			/*GW::MATH::GMATRIXF SkyboxViewMatrix;
+			matMath.TranslateLocalF(viewMat,viewTran,SkyboxViewMatrix);*/
+			glUseProgram(shaderExecutableSkybox);
+			
+			GLint locationVS = glGetUniformLocation(shaderExecutableSkybox, "view");
+			glUniformMatrix4fv(locationVS, 1, GL_FALSE, (GLfloat*)&viewMat);
+			//Projection
+			GLint locationPS = glGetUniformLocation(shaderExecutableSkybox, "projection");
+			glUniformMatrix4fv(locationPS, 1, GL_FALSE, (GLfloat*)&projMat);	
+			
+			// skybox cube
+			glBindVertexArray(skyboxVAO);
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+			glUseProgram(shaderExecutableSkybox);
+			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
+			glDepthFunc(GL_LESS); // set depth function back to default
+
+			//glBindVertexArray(0);
 			/*for (int i = 0; i < models.size(); i++)
 			{
 				models[i].DrawModel();
@@ -539,6 +722,37 @@
 			matMath.InverseF(viewMat, viewMat);
 			//prevTimeInput = currTime;
 		}
+		unsigned int loadCubemap(std::vector<std::string> faces)
+		{
+			unsigned int textureID;
+			glGenTextures(1, &textureID);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+			int width, height, nrChannels;
+			for (unsigned int i = 0; i < faces.size(); i++)
+			{
+				unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+				if (data)
+				{
+					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+						0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+					);
+					stbi_image_free(data);
+				}
+				else
+				{
+					std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+					stbi_image_free(data);
+				}
+			}
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+			return textureID;
+		}
 		~Renderer()
 		{
 			//// free resources
@@ -549,8 +763,16 @@
 			glDeleteShader(vertexShader);
 			glDeleteShader(fragmentShader);
 			glDeleteProgram(shaderExecutable);
+		
 			//// TODO: Part 2c
 			glDeleteBuffers(1, &uboBuffer);
+
+			//skymap
+			glDeleteVertexArrays(1, &skyboxVAO);
+			glDeleteBuffers(1, &skyboxVBO);
+			glDeleteShader(vertexShaderSkybox);
+			glDeleteShader(fragmentShaderSkybox);
+			glDeleteProgram(shaderExecutableSkybox);
 		}
 	
 		
@@ -589,6 +811,9 @@ private:
 	PFNGLUNIFORMBLOCKBINDINGPROC        glUniformBlockBinding = nullptr;
 	PFNGLMAPBUFFERPROC                  glMapBuffer = nullptr;
 	PFNGLUNMAPBUFFERPROC                glUnmapBuffer = nullptr;
+	PFNGLACTIVETEXTUREPROC              glActiveTexture = nullptr;
+	PFNGLUNIFORM1IPROC                  glUniform1i = nullptr;
+	
 
 	// Modern OpenGL API functions need to be queried
 	void LoadExtensions()
@@ -626,5 +851,7 @@ private:
 		ogl.QueryExtensionFunction(nullptr, "glUniformBlockBinding", (void**)&glUniformBlockBinding);
 		ogl.QueryExtensionFunction(nullptr, "glMapBuffer", (void**)&glMapBuffer);
 		ogl.QueryExtensionFunction(nullptr, "glUnmapBuffer", (void**)&glUnmapBuffer);
+		ogl.QueryExtensionFunction(nullptr, "glActiveTexture", (void**)&glActiveTexture);
+		ogl.QueryExtensionFunction(nullptr, "glUniform1i", (void**)&glUniform1i);
 	}
 };

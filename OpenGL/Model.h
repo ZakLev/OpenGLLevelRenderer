@@ -8,125 +8,125 @@
 #include "h2bParser.h"
 #include "../Assets/FSLogo.h"
 
-// Simple Vertex Shader
-const char* vertexShaderSource = R"(
-#version 330 // GLSL 3.30
-// an ultra simple glsl vertex shader
-// TODO: Part 2b
-struct OBJ_ATTRIBUTES
-{
-	vec3    Kd; // diffuse reflectivity
-	float	    d; // dissolve (transparency) 
-	vec3    Ks; // specular reflectivity
-	float       Ns; // specular exponent
-	vec3    Ka; // ambient reflectivity
-	float       sharpness; // local reflection map sharpness
-	vec3    Tf; // transmission filter
-	float       Ni; // optical density (index of refraction)
-	vec3    Ke; // emissive reflectivity
-	uint    illum; // illumination model
-};
-
-// The following GLSL syntax specefies a uniform buffer
-// where the matricies contained within are row major.
-layout(row_major) uniform UBO_DATA
-{
-    vec4 sunDirection, sunColor;
-    mat4 viewMatrix, projectionMatrix;
-    mat4 world;
-    OBJ_ATTRIBUTES material;
-    vec4 sunAmbient, camPos;
-};
-// TODO: Part 4e
-// TODO: Part 1f
-// TODO: Part 4a
-layout(location = 0) in vec3 local_pos;
-layout(location = 1) in vec3 local_uvw;
-layout(location = 2) in vec3 local_nrm;
-out vec3 world_nrm;
-out vec3 worldPos;
-void main()
-{
-	// TODO: Part 1f
-	//gl_Position = vec4(local_pos, 1);
-//gl_UVs = vec3(UV);
-//gl_Norm = vec3(Norm);
-	// TODO: Part 1h
-//gl_Position.y -= 0.75;
-	// TODO: Part 2h
-vec4 pos4 = vec4(local_pos, 1);
- vec4 positionW = pos4 * world;
- vec4 positionV = positionW* viewMatrix;
- vec4 position = positionV* projectionMatrix;
-gl_Position = vec4(position);
-worldPos = vec3(positionW);
-	// TODO: Part 4b
-	vec3 nrm = vec3(vec4(local_nrm, 0.0) * world);
-    world_nrm = nrm;
-}
-)";
-// Simple Fragment Shader
-const char* fragmentShaderSource = R"(
-#version 330 // GLSL 3.30
-out vec4 Pixel;
-// an ultra simple glsl fragment shader
-// TODO: Part 3a
-struct OBJ_ATTRIBUTES
-{
-	vec3    Kd; // diffuse reflectivity
-	float	    d; // dissolve (transparency) 
-	vec3    Ks; // specular reflectivity
-	float       Ns; // specular exponent
-	vec3    Ka; // ambient reflectivity
-	float       sharpness; // local reflection map sharpness
-	vec3    Tf; // transmission filter
-	float       Ni; // optical density (index of refraction)
-	vec3    Ke; // emissive reflectivity
-	uint    illum; // illumination model
-};
-
-// The following GLSL syntax specefies a uniform buffer
-// where the matricies contained within are row major.
-layout(row_major) uniform UBO_DATA
-{
-    vec4 sunDirection, sunColor;
-    mat4 viewMatrix, projectionMatrix;
-    mat4 world;
-    OBJ_ATTRIBUTES material;
-    vec4 sunAmbient, camPos;
-};
-// TODO: Part 4e
-// TODO: Part 4b
-in vec3 world_nrm;
-in vec3 worldPos;
-void main() 
-{	
-	// TODO: Part 3a
-	//Pixel = vec4(170/255.0f, 170/255.0f, 44/255.0f, 1); // TODO: Part 1a
-    vec4 color = vec4(material.Kd,1);
-vec3 nrm = normalize(world_nrm);
-float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
-	// TODO: Part 4e
-	// TODO: Part 4f (half-vector or reflect method)
-     vec3 reflectDir = reflect(normalize(sunDirection.xyz), nrm);
-vec3 posW = vec3(worldPos.x,worldPos.y,worldPos.z);
-vec3 camDir = normalize(camPos.xyz - posW.xyz );
-      float spec = pow(max(dot(camDir, reflectDir), 0.0), material.Ns);
-vec3 specular = spec * material.Ks;
-vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
-Pixel = vec4(diffuse,1);
-//Pixel = vec4(diffuse,1) * color;
-}
-)";
-// Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
-#ifndef NDEBUG
-	void MessageCallback(	GLenum source, GLenum type, GLuint id,
-							GLenum severity, GLsizei length,
-							const GLchar* message, const void* userParam) {
-		fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
-	}
-#endif
+//// Simple Vertex Shader
+//const char* vertexShaderSource = R"(
+//#version 330 // GLSL 3.30
+//// an ultra simple glsl vertex shader
+//// TODO: Part 2b
+//struct OBJ_ATTRIBUTES
+//{
+//	vec3    Kd; // diffuse reflectivity
+//	float	    d; // dissolve (transparency) 
+//	vec3    Ks; // specular reflectivity
+//	float       Ns; // specular exponent
+//	vec3    Ka; // ambient reflectivity
+//	float       sharpness; // local reflection map sharpness
+//	vec3    Tf; // transmission filter
+//	float       Ni; // optical density (index of refraction)
+//	vec3    Ke; // emissive reflectivity
+//	uint    illum; // illumination model
+//};
+//
+//// The following GLSL syntax specefies a uniform buffer
+//// where the matricies contained within are row major.
+//layout(row_major) uniform UBO_DATA
+//{
+//    vec4 sunDirection, sunColor;
+//    mat4 viewMatrix, projectionMatrix;
+//    mat4 world;
+//    OBJ_ATTRIBUTES material;
+//    vec4 sunAmbient, camPos;
+//};
+//// TODO: Part 4e
+//// TODO: Part 1f
+//// TODO: Part 4a
+//layout(location = 0) in vec3 local_pos;
+//layout(location = 1) in vec3 local_uvw;
+//layout(location = 2) in vec3 local_nrm;
+//out vec3 world_nrm;
+//out vec3 worldPos;
+//void main()
+//{
+//	// TODO: Part 1f
+//	//gl_Position = vec4(local_pos, 1);
+////gl_UVs = vec3(UV);
+////gl_Norm = vec3(Norm);
+//	// TODO: Part 1h
+////gl_Position.y -= 0.75;
+//	// TODO: Part 2h
+//vec4 pos4 = vec4(local_pos, 1);
+// vec4 positionW = pos4 * world;
+// vec4 positionV = positionW* viewMatrix;
+// vec4 position = positionV* projectionMatrix;
+//gl_Position = vec4(position);
+//worldPos = vec3(positionW);
+//	// TODO: Part 4b
+//	vec3 nrm = vec3(vec4(local_nrm, 0.0) * world);
+//    world_nrm = nrm;
+//}
+//)";
+//// Simple Fragment Shader
+//const char* fragmentShaderSource = R"(
+//#version 330 // GLSL 3.30
+//out vec4 Pixel;
+//// an ultra simple glsl fragment shader
+//// TODO: Part 3a
+//struct OBJ_ATTRIBUTES
+//{
+//	vec3    Kd; // diffuse reflectivity
+//	float	    d; // dissolve (transparency) 
+//	vec3    Ks; // specular reflectivity
+//	float       Ns; // specular exponent
+//	vec3    Ka; // ambient reflectivity
+//	float       sharpness; // local reflection map sharpness
+//	vec3    Tf; // transmission filter
+//	float       Ni; // optical density (index of refraction)
+//	vec3    Ke; // emissive reflectivity
+//	uint    illum; // illumination model
+//};
+//
+//// The following GLSL syntax specefies a uniform buffer
+//// where the matricies contained within are row major.
+//layout(row_major) uniform UBO_DATA
+//{
+//    vec4 sunDirection, sunColor;
+//    mat4 viewMatrix, projectionMatrix;
+//    mat4 world;
+//    OBJ_ATTRIBUTES material;
+//    vec4 sunAmbient, camPos;
+//};
+//// TODO: Part 4e
+//// TODO: Part 4b
+//in vec3 world_nrm;
+//in vec3 worldPos;
+//void main() 
+//{	
+//	// TODO: Part 3a
+//	//Pixel = vec4(170/255.0f, 170/255.0f, 44/255.0f, 1); // TODO: Part 1a
+//    vec4 color = vec4(material.Kd,1);
+//vec3 nrm = normalize(world_nrm);
+//float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
+//	// TODO: Part 4e
+//	// TODO: Part 4f (half-vector or reflect method)
+//     vec3 reflectDir = reflect(normalize(sunDirection.xyz), nrm);
+//vec3 posW = vec3(worldPos.x,worldPos.y,worldPos.z);
+//vec3 camDir = normalize(camPos.xyz - posW.xyz );
+//      float spec = pow(max(dot(camDir, reflectDir), 0.0), material.Ns);
+//vec3 specular = spec * material.Ks;
+//vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
+//Pixel = vec4(diffuse,1);
+////Pixel = vec4(diffuse,1) * color;
+//}
+//)";
+//// Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
+//#ifndef NDEBUG
+//	void MessageCallback(	GLenum source, GLenum type, GLuint id,
+//							GLenum severity, GLsizei length,
+//							const GLchar* message, const void* userParam) {
+//		fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+//		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
+//	}
+//#endif
 
 class Model 
 {
@@ -146,7 +146,7 @@ class Model
 	// TODO: Part 2c
 	//GLuint uboBuffer = 0;
 	// TODO: Part 2a
-	GW::MATH::GMatrix matMath;
+	//GW::MATH::GMatrix matMath;
 	GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
 	GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
 	GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
@@ -195,7 +195,7 @@ public:
 			// TODO: part 2a
 			/*GIn.Create(win);
 			GCon.Create();*/
-			matMath.Create();
+			//matMath.Create();
 		//	win.GetHeight(screenHeight);
 		//	win.GetWidth(screenWidth);
 			//World
@@ -236,10 +236,10 @@ public:
 			// Link Needed OpenGL API functions
 			LoadExtensions();
 			// In debug mode we link openGL errors to the console
-	#ifndef NDEBUG
-			glEnable(GL_DEBUG_OUTPUT);
-			glDebugMessageCallback(MessageCallback, 0);
-	#endif
+	//#ifndef NDEBUG
+	//		glEnable(GL_DEBUG_OUTPUT);
+	//		glDebugMessageCallback(MessageCallback, 0);
+	//#endif
 
 
 			glGenVertexArrays(1, &vertexArray);

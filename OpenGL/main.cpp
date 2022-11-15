@@ -11,6 +11,8 @@
 #define GATEWARE_DISABLE_GVULKANSURFACE // we have another template for this
 #define GATEWARE_DISABLE_GRASTERSURFACE // we have another template for this
 // With what we want & what we don't defined we can include the API
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "../Gateware/Gateware.h"
 #include "Model.h"
 #include "renderer.h" // example rendering code (not Gateware code!)
