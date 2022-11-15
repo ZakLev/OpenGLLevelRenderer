@@ -181,9 +181,9 @@ public:
 		/*GW::MATH::GMATRIXF Model::GetWorldPosition() { return worldPosition; };
 		void Model::SetWorldPosition( GW::MATH::GMATRIXF& wp) { worldPosition = wp; };
 		*/
-		bool LoadModelData(const char* filePath) {
+		/*bool LoadModelData(const char* filePath) {
 			return parser.Parse(filePath);
-		}
+		}*/
 		bool UploadModelDataToGPU(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
 		{
 			//int cm = 1;
@@ -221,8 +221,12 @@ public:
 		//	UBO.viewMatrix = viewMat;
 		//	UBO.projectionMatrix = projMat;
 			UBO.world = worldMat;
+			if (parser.materialCount > 0)
+			{
+
 			OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&parser.materials[0].attrib;
 			UBO.material = *obj;
+			}
 			//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
 
 
