@@ -35,6 +35,9 @@ int main()
 	bool changeLevel = false;
 	int level = 0;
 	char* filePath = "../../Assets/GameLevel.txt";
+	char* musicPath = "../../Assets/Music/OOOF.wav";
+	GW::AUDIO::GMusic song;
+	GW::AUDIO::GAudio aud;
 	//FileIO readFile;
    // LevelData data;
 	//std::vector<Model*> models = {};
@@ -66,25 +69,22 @@ int main()
 				clr[2] += 0.01f; // shift color as they resize
 		});
 		win.Register(msgs);
-		bool play = true;
-		if (play)
-		{
-
-		GW::AUDIO::GMusic song;
-		GW::AUDIO::GAudio aud;
-		std::string musicPath = "../../Assets/Music/OOOF.wav";
-		aud.Create();
-		song.Create(musicPath.c_str(), aud, 1.0f);
-		song.Play(true);
-		aud.PlayMusic();
-		}
+		
 		
 		do
 		{
 			changeLevel = false;
 		if (+ogl.Create(win, GW::GRAPHICS::DEPTH_BUFFER_SUPPORT))
 		{
-			
+			bool isPlay;
+			song.isPlaying(isPlay);
+			if (isPlay)
+			{
+				aud.Create();
+				song.Create(musicPath, aud, 1.0f);
+				song.Play(true);
+				aud.PlayMusic();
+			}
 			Renderer renderer(win, ogl, filePath);
 			
 			
