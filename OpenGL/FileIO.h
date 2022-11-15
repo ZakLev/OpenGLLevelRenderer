@@ -10,7 +10,7 @@ class FileIO
 {
     H2B::Parser parser;
 public:
-   
+    unsigned int amount = 0;
 //void ReadGameLevel(std::vector<GW::MATH::GMATRIXF>& worldPositions, std::vector<std::string>& Names, std::vector<H2B::Parser>& parsers, char* fileName = "../../Assets/GameLevel.txt")
 void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/GameLevel.txt")
 {
@@ -23,12 +23,13 @@ void ReadGameLevel(std::vector<Model>& models, char* fileName = "../../Assets/Ga
         {
             
             std::istringstream iss(line);
-           std::cout << line.c_str() << std::endl;
            if (line.compare("MESH") == 0)
            {
+           std::cout << line.c_str() << " #" << amount << std::endl;
+               amount++;
                std::getline(file, line);
                std::istringstream iss(line);
-               std::cout << line.c_str() << std::endl;
+               std::cout << line.c_str() <<  std::endl;
                int checkDecimal = line.length() - 4;
                if (line.compare(checkDecimal, 1, ".") == 0)
                {

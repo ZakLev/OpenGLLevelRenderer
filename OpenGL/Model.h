@@ -404,7 +404,7 @@ public:
 					}*/
 					// some video cards(cough Intel) need this set back to zero or they won't display
 			}
-			glBindVertexArray(0);
+			//glBindVertexArray(0);
 		}
 		//void UpdateCamera(float _SPLSLF)
 		//{

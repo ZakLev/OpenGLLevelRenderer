@@ -265,8 +265,8 @@
 				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
 				//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (models[cm].parser.indices.size()), models[cm].parser.indices.data(), GL_STATIC_DRAW);
 				// TODO: Part 2c
-				/*models[1].UploadModelDataToGPU(win, ogl);
-			   models[7].UploadModelDataToGPU(win, ogl);*/
+				//models[1].UploadModelDataToGPU(win, ogl);
+			  // models[29].UploadModelDataToGPU(win, ogl);
 			    for (int i = 0; i < models.size(); i++)
 			   {
 				   models[i].UploadModelDataToGPU(win,ogl);
@@ -344,15 +344,14 @@
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
 			prevTime = currTime;
-			/*models[1]->UpdateCamera(deltaTime);
-			models[1]->DrawModel();*/
-			//models[7].UpdateCamera(deltaTime);
-			/*models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
-			models[7].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);*/
+			
+			//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
+			//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
 			for (int i = 0; i < models.size(); i++)
 			{
 				models[i].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
 			}
+			glBindVertexArray(0);
 			/*for (int i = 0; i < models.size(); i++)
 			{
 				models[i].DrawModel();
