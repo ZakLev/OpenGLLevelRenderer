@@ -133,8 +133,6 @@ class Model
 
 	GW::SYSTEM::GWindow win;
 	GW::GRAPHICS::GOpenGLSurface ogl;
-	GW::INPUT::GInput GIn;
-	GW::INPUT::GController GCon;
 	// what we need at a minimum to draw a triangle
 	GLuint vertexArray = 0;
 	GLuint vertexBufferObject = 0;

@@ -143,7 +143,9 @@ const char* vertexShaderSkyboxSource = R"(
 void main()
 {
 	TexCoords = vec3(aPos.xy,-aPos.z);
-  vec4 pos = projection * mat4(mat3(view)) * vec4(aPos, 1.0);
+mat4 unTransView = mat4(mat3(view));
+
+  vec4 pos = projection * unTransView * vec4(aPos, 1.0);
 	gl_Position = pos.xyzw;
 //gl_Position = projection * view * vec4(aPos, 1.0);
 }
@@ -779,6 +781,7 @@ void main()
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		//	glTexParameteri(GL_TEXTURE_CUBE_MAP, WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB, GL_CLAMP_TO_EDGE);
 
 			return textureID;
 		}

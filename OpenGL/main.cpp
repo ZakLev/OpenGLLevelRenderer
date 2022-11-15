@@ -4,12 +4,14 @@
 #define GATEWARE_ENABLE_GRAPHICS // Enables all Graphics Libraries
 #define GATEWARE_ENABLE_MATH  // Math Library
 #define GATEWARE_ENABLE_INPUT
+#define GATEWARE_ENABLE_AUDIO
 // TODO: Part 2a
 // Ignore some GRAPHICS libraries we aren't going to use
 #define GATEWARE_DISABLE_GDIRECTX11SURFACE // we have another template for this
 #define GATEWARE_DISABLE_GDIRECTX12SURFACE // we have another template for this
 #define GATEWARE_DISABLE_GVULKANSURFACE // we have another template for this
 #define GATEWARE_DISABLE_GRASTERSURFACE // we have another template for this
+
 // With what we want & what we don't defined we can include the API
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -64,6 +66,25 @@ int main()
 				clr[2] += 0.01f; // shift color as they resize
 		});
 		win.Register(msgs);
+		bool play = true;
+		if (play)
+		{
+
+		GW::AUDIO::GMusic song;
+		GW::AUDIO::GAudio aud;
+		std::string musicPath = "../../Assets/Music/OOOF.mp3";
+		aud.Create();
+		song.Create(musicPath.c_str(), aud, 1.0f);
+	//	int channel;
+		//song.GetOutputChannels(channel);
+		//song.GetSourceChannels();
+		aud.SetMasterVolume(1.0f);
+		aud.SetGlobalMusicVolume(1.0f);
+		aud.SetGlobalSoundVolume(1.0f);
+		song.Play(true);
+		aud.PlayMusic();
+		}
+		
 		do
 		{
 			changeLevel = false;
@@ -71,6 +92,7 @@ int main()
 		{
 			
 			Renderer renderer(win, ogl, filePath);
+			
 			
 			while (+win.ProcessWindowEvents())
 			{
