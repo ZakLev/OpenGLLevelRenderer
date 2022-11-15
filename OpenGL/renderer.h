@@ -146,7 +146,7 @@ void main()
 mat4 unTransView = mat4(mat3(view));
 
   vec4 pos = projection * unTransView * vec4(aPos, 1.0);
-	gl_Position = pos.xyzw;
+	gl_Position = pos.xyww;
 //gl_Position = projection * view * vec4(aPos, 1.0);
 }
 )";
@@ -546,6 +546,8 @@ void main()
 				models[i].DrawModel(shaderExecutable, viewMat, projMat);
 			}
 
+			//models[0].DrawModel(shaderExecutable, viewMat, projMat);
+
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 			//skyboxShader.use();
 			/*GW::MATH::GVECTORF viewTran; 
@@ -555,6 +557,7 @@ void main()
 			viewTran.z = viewTran.z * -1;*/
 			/*GW::MATH::GMATRIXF SkyboxViewMatrix;
 			matMath.TranslateLocalF(viewMat,viewTran,SkyboxViewMatrix);*/
+
 			glUseProgram(shaderExecutableSkybox);
 			
 			GLint locationVS = glGetUniformLocation(shaderExecutableSkybox, "view");

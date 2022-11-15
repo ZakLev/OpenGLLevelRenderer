@@ -246,7 +246,7 @@ public:
 			glGenBuffers(1, &vertexBufferObject);
 			glBindVertexArray(vertexArray);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			glBufferData(GL_ARRAY_BUFFER, sizeof(parser.vertices), (void*)&parser.vertices, GL_STATIC_DRAW);
+			//glBufferData(GL_ARRAY_BUFFER, sizeof(parser.vertices), (void*)&parser.vertices, GL_STATIC_DRAW);
 			glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * parser.vertices.size(), parser.vertices.data(), GL_STATIC_DRAW);
 			// TODO: Part 1g
 			glGenBuffers(1, &indiciesBuffer);
@@ -315,6 +315,7 @@ public:
 				{*/
 
 				// setup the pipeline
+			glUseProgram(shaderExecutable);
 				//World
 			UBO.viewMatrix = viewMat;
 				UBO.projectionMatrix = projMat;
@@ -330,29 +331,28 @@ public:
 			glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
 
 			// TODO: Part 1e
+			glBindVertexArray(vertexArray);
+			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
 			/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);*/
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
 			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			glUseProgram(shaderExecutable);
+			//glUseProgram(shaderExecutable);
 			/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);*/
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)12);
 			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			glUseProgram(shaderExecutable);
+			//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			//glUseProgram(shaderExecutable);
 			/*glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);*/
 			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)24);
 			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			glUseProgram(shaderExecutable);
+			//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
+			//glUseProgram(shaderExecutable);
 			// now we can draw
-			glBindVertexArray(vertexArray);
-			glUseProgram(shaderExecutable);
 			// TODO: Part 1d
 			// TODO: Part 1h
 
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			glUseProgram(shaderExecutable);
+			//glUseProgram(shaderExecutable);
 			// TODO: Part 2e
 			unsigned int block_index = glGetUniformBlockIndex(shaderExecutable, "UBO");
 			// TODO: Part 2f
