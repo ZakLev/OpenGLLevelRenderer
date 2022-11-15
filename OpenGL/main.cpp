@@ -35,6 +35,7 @@ int main()
 	bool changeLevel = false;
 	bool playSound = false;
 	bool soundOver = false;
+	bool openDialogue = false;
 	int level = 0;
 	char* filePath = "../../Assets/GameLevel.txt";
 	char* musicPath = "../../Assets/Music/OOOF.wav";

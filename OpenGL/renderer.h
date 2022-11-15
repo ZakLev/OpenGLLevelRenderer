@@ -6,6 +6,7 @@
 #include <vector>
 #include "Model.h"
 #include "FileIO.h"
+
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
 #version 330 // GLSL 3.30
@@ -711,6 +712,7 @@ void main()
 			float levelChange2 = 0;
 			float levelChange1 = 0;
 			float playAug = 0;
+			float fileOpen = 0;
 			GIn.GetState(G_KEY_4, levelChange2);
 			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
 			{
@@ -731,6 +733,15 @@ void main()
 			{
 				playSound = true;
 				playAug = 0;
+
+			}
+			GIn.GetState(G_KEY_F1, fileOpen);
+			if (fileOpen != 0)
+			{
+				changeLevel = true;
+				
+				fileOpen = 0;
+				//IFileOpenDialog *fileOpen;
 
 			}
 			win.GetHeight(screenHeight);
@@ -819,6 +830,10 @@ void main()
 		//	glTexParameteri(GL_TEXTURE_CUBE_MAP, WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB, GL_CLAMP_TO_EDGE);
 
 			return textureID;
+		}
+		void getFile()
+		{
+			
 		}
 		~Renderer()
 		{
