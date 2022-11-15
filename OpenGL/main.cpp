@@ -72,7 +72,7 @@ int main()
 
 		GW::AUDIO::GMusic song;
 		GW::AUDIO::GAudio aud;
-		std::string musicPath = "../../Assets/Music/OOOF.mp3";
+		std::string musicPath = "../../Assets/Music/OOOF.wav";
 		aud.Create();
 		song.Create(musicPath.c_str(), aud, 1.0f);
 		song.Play(true);

@@ -90,7 +90,7 @@ void filter(std::string &line)
 {
     std::string temp = "";
     for (int i = 0; i < line.size(); ++i) {
-        if ((line[i] >= '0' && line[i] <= '9') || (line[i] == '.') || (line[i] == ' ')) {
+        if ((line[i] >= '0' && line[i] <= '9') || (line[i] == '.') || (line[i] == ' ') || (line[i] == '-')) {
             temp = temp + line[i];
         }
     }
