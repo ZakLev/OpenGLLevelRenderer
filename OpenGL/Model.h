@@ -221,12 +221,10 @@ public:
 		//	UBO.viewMatrix = viewMat;
 		//	UBO.projectionMatrix = projMat;
 			UBO.world = worldMat;
-			if (parser.materialCount > 0)
-			{
-
+			
 			OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&parser.materials[0].attrib;
 			UBO.material = *obj;
-			}
+			
 			//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
 
 
@@ -395,7 +393,7 @@ public:
 				memcpy(ptr, &UBO, sizeof(UBO));
 				// make sure to tell OpenGL we're done with the pointer
 				glUnmapBuffer(GL_ARRAY_BUFFER);
-
+				glUseProgram(shaderExecutable);
 				// TODO: Part 4e
 			//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
 			//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);

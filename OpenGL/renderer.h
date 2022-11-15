@@ -142,8 +142,10 @@ const char* vertexShaderSkyboxSource = R"(
 
 void main()
 {
-	TexCoords = aPos;
-	gl_Position = projection * mat4(mat3(view)) * vec4(aPos, 1.0);
+	TexCoords = vec3(aPos.xy,-aPos.z);
+  vec4 pos = projection * mat4(mat3(view)) * vec4(aPos, 1.0);
+	gl_Position = pos.xyzw;
+//gl_Position = projection * view * vec4(aPos, 1.0);
 }
 )";
 const char* fragmentShaderSkyboxSource = R"(
@@ -290,6 +292,7 @@ void main()
 			 1.0f, -1.0f, -1.0f,
 			-1.0f, -1.0f,  1.0f,
 			 1.0f, -1.0f,  1.0f
+
 		};
 	public:
 		//Level Data
@@ -474,11 +477,11 @@ void main()
 				glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
 				glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
 				glEnableVertexAttribArray(0);
-				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
+				glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
 				
 				glUseProgram(shaderExecutableSkybox);
 				glUniform1i(glGetUniformLocation(shaderExecutableSkybox, "shader"), 0);
-				glUseProgram(shaderExecutableSkybox);
+				//glUseProgram(shaderExecutableSkybox);
 			
 				
 			//}
@@ -509,7 +512,7 @@ void main()
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
 			prevTime = currTime;
-			
+			glUseProgram(shaderExecutable);
 			//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
 			//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
 			for (int i = 0; i < models.size(); i++)
