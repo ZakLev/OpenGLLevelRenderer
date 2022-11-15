@@ -458,16 +458,40 @@ void main()
 					glGetProgramInfoLog(shaderExecutableSkybox, 1024, NULL, errorsSkybox);
 					std::cout << errorsSkybox << std::endl;
 				}
-
-				std::vector<std::string> faces
+				std::vector<std::string> faces;
+				if (filePath.compare("../../Assets/GameLevel.txt") == 0)
 				{
-					"../../Assets/skybox/right.jpg",
-						"../../Assets/skybox/left.jpg",
-						"../../Assets/skybox/top.jpg",
-						"../../Assets/skybox/bottom.jpg",
-						"../../Assets/skybox/front.jpg",
-						"../../Assets/skybox/back.jpg"
-				};
+
+				
+						std::string right = "../../Assets/skybox/right.jpg";
+						std::string left = "../../Assets/skybox/left.jpg";
+						std::string top = "../../Assets/skybox/top.jpg";
+						std::string bottom = "../../Assets/skybox/bottom.jpg";
+						std::string front = "../../Assets/skybox/front.jpg";
+						std::string back ="../../Assets/skybox/back.jpg";
+						faces.push_back(right);
+						faces.push_back(left);
+						faces.push_back(top);
+						faces.push_back(bottom);
+						faces.push_back(front);
+						faces.push_back(back);
+				
+				}
+				else if (filePath.compare("../../Assets/GameLevel2.txt") == 0)
+				{
+					std::string right = "../../Assets/skybox2/right.jpg";
+					std::string left = "../../Assets/skybox2/left.jpg";
+					std::string top = "../../Assets/skybox2/top.jpg";
+					std::string bottom = "../../Assets/skybox2/bottom.jpg";
+					std::string front = "../../Assets/skybox2/front.jpg";
+					std::string back = "../../Assets/skybox2/back.jpg";
+					faces.push_back(right);
+					faces.push_back(left);
+					faces.push_back(top);
+					faces.push_back(bottom);
+					faces.push_back(front);
+					faces.push_back(back);
+				}
 				 cubemapTexture = loadCubemap(faces);
 
 				// skybox VAO
