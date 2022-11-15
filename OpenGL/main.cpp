@@ -30,8 +30,11 @@ int main()
 	GWindow win;
 	GEventResponder msgs;
 	GOpenGLSurface ogl;
-	FileIO readFile;
-    LevelData data;
+	bool changeLevel = false;
+	int level = 0;
+	char* filePath = "../../Assets/GameLevel.txt";
+	//FileIO readFile;
+   // LevelData data;
 	//std::vector<Model*> models = {};
 	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
 	//readFile.ReadGameLevel(models);
@@ -61,20 +64,26 @@ int main()
 				clr[2] += 0.01f; // shift color as they resize
 		});
 		win.Register(msgs);
-		
+		do
+		{
+			changeLevel = false;
 		if (+ogl.Create(win, GW::GRAPHICS::DEPTH_BUFFER_SUPPORT))
 		{
-			Renderer renderer(win, ogl);
+			
+			Renderer renderer(win, ogl, filePath);
 			
 			while (+win.ProcessWindowEvents())
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				renderer.UpdateCamera();
+				renderer.UpdateCamera(changeLevel, filePath);
+				if (changeLevel)
+					break;
 				renderer.Render();
 				ogl.UniversalSwapBuffers();
 			}
 		}
+		} while (changeLevel);
 	}
 	return 0; // that's all folks
 }

@@ -200,6 +200,7 @@ void main()
 		GW::INPUT::GInput GIn;
 		GW::INPUT::GController GCon;
 		FileIO readFile;
+		std::string filePath = "";
 		//std::vector<Model*> models = {};
 		std::vector<Model> models = {};
 		//// what we need at a minimum to draw a triangle
@@ -295,7 +296,7 @@ void main()
 		 //LevelData lvlData;
 
 
-		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
+		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl, char* fileName = "")
 		{
 			//int cm = 1;
 			///*for (int cm = 0; cm < models.size(); cm++)
@@ -303,7 +304,15 @@ void main()
 
 				win = _win;
 				ogl = _ogl;
+				filePath = fileName;
+				/*if (filePath.compare(""))
+				{
 				readFile.ReadGameLevel(models);
+				}
+				else
+				{*/
+				readFile.ReadGameLevel(models, filePath.c_str());
+				//}
 
 				
 			//	// TODO: part 2a
@@ -533,7 +542,7 @@ void main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 			glDepthFunc(GL_LESS); // set depth function back to default
-
+			
 			//glBindVertexArray(0);
 			/*for (int i = 0; i < models.size(); i++)
 			{
@@ -660,13 +669,30 @@ void main()
 
 			models = modelsData;
 		}*/
-		void UpdateCamera()
+		void UpdateCamera(bool& changeLevel,char*& fileName)
 		{
 
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			FPS = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime);
 			float SPSLF = FPS.count() / 100000.0f;
 			//float SPSLF = _SPLSLF;
+			float levelChange2 = 0;
+			float levelChange1 = 0;
+			GIn.GetState(G_KEY_4, levelChange2);
+			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
+			{
+				levelChange2 = 0;
+				fileName = "../../Assets/GameLevel2.txt";
+				changeLevel = true;
+			}
+			GIn.GetState(G_KEY_3, levelChange1);
+			if (levelChange1 != 0 && filePath != "../../Assets/GameLevel.txt")
+			{
+				levelChange1 = 0;
+				fileName = "../../Assets/GameLevel.txt";
+				changeLevel = true;
+				
+			}
 			win.GetHeight(screenHeight);
 			win.GetWidth(screenWidth);
 			// TODO Part 4c
