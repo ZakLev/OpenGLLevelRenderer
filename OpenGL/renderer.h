@@ -135,14 +135,19 @@ Pixel = vec4(diffuse,1);
 const char* vertexShaderSkyboxSource = R"(
 #version 330 // GLSL 3.30
 	layout (location = 0) in vec3 aPos;
+    layout (location = 1) in vec3 aNormal;
 
 	out vec3 TexCoords;
+    out VS_OUT {
+    vec3 normal;
+} vs_out;
 
 	uniform mat4 projection;
 	uniform mat4 view;
 
 void main()
 {
+    
 	TexCoords = vec3(aPos.xy,-aPos.z);
 mat4 unTransView = mat4(mat3(view));
 
@@ -163,6 +168,65 @@ void main()
 	FragColor = texture(skybox, TexCoords);
 }
 )";
+const char* vertexShaderFurSource = R"(
+#version 330 // GLSL 3.30
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 uvw;
+layout (location = 2) in vec3 aNormal;
+
+out VS_OUT {
+    vec3 normal;
+} vs_out;
+
+uniform mat4 view;
+uniform mat4 model;
+
+void main()
+{
+    mat3 normalMatrix = mat3(transpose(inverse(view * model)));
+    vs_out.normal = vec3(vec4(normalMatrix * aNormal, 0.0));
+    gl_Position = view * model * vec4(aPos, 1.0); 
+}
+)";
+const char* fragmentShaderFurSource = R"(
+#version 330 // GLSL 3.30
+	out vec4 FragColor;
+
+void main()
+{
+    FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+}
+)";
+const char* geometryShaderFurSource = R"(
+#version 330 // GLSL 3.30
+layout (triangles) in;
+layout (line_strip, max_vertices = 6) out;
+
+in VS_OUT {
+    vec3 normal;
+} gs_in[];
+
+const float MAGNITUDE = 0.2;
+
+uniform mat4 projection;
+
+void GenerateLine(int index)
+{
+    gl_Position = projection * gl_in[index].gl_Position;
+    EmitVertex();
+    gl_Position = projection * (gl_in[index].gl_Position + vec4(gs_in[index].normal, 0.0) * MAGNITUDE);
+    EmitVertex();
+    EndPrimitive();
+}
+
+void main()
+{
+    GenerateLine(0); // first vertex normal
+    GenerateLine(1); // second vertex normal
+    GenerateLine(2); // third vertex normal
+}
+)";
+
 // Used to print debug infomation from OpenGL, pulled straight from the official OpenGL wiki.
 #ifndef NDEBUG
 	void MessageCallback(	GLenum source, GLenum type, GLuint id,
@@ -226,6 +290,11 @@ void main()
 		GLuint vertexShaderSkybox = 0;
 		GLuint fragmentShaderSkybox = 0;
 		GLuint shaderExecutableSkybox = 0;
+
+		GLuint vertexShaderFur = 0;
+		GLuint fragmentShaderFur = 0;
+		GLuint geometryShaderFur = 0;
+		GLuint shaderExecutableFur = 0;
 		//// TODO: Part 2a
 		GW::MATH::GMatrix matMath;
 		//GW::I::GCollisionImplementation colider;
@@ -244,6 +313,7 @@ void main()
 		bool viewLock = false;
 		unsigned int screenHeight;
 		unsigned int screenWidth;
+		std::vector<int> horseModels;
 		//float ftheta = 0;
 		//// TODO: Part 2b
 		struct UBO_DATA
@@ -392,6 +462,8 @@ void main()
 			    for (int i = 0; i < models.size(); i++)
 			   {
 				   models[i].UploadModelDataToGPU(win,ogl);
+				   if (models[i].Name.compare("Statue_Horse") == 0)
+					   horseModels.push_back(i);
 			   }
 
 				//glGenBuffers(1, &uboBuffer);
@@ -508,8 +580,6 @@ void main()
 				 cubemapTexture = loadCubemap(faces);
 
 				// skybox VAO
-				/*unsigned int skyboxVAO, skyboxVBO;*/
-				
 				glGenVertexArrays(1, &skyboxVAO);
 				glGenBuffers(1, &skyboxVBO);
 				glBindVertexArray(skyboxVAO);
@@ -520,7 +590,51 @@ void main()
 				
 				glUseProgram(shaderExecutableSkybox);
 				glUniform1i(glGetUniformLocation(shaderExecutableSkybox, "shader"), 0);
-				//glUseProgram(shaderExecutableSkybox);
+				
+
+				//Geomtry Fur Shader
+				vertexShaderFur = glCreateShader(GL_VERTEX_SHADER);
+				glShaderSource(vertexShaderFur, 1, &vertexShaderFurSource, NULL);
+				glCompileShader(vertexShaderFur);
+				char errorsFur[1024]; GLint resultFur;
+				glGetShaderiv(vertexShaderFur, GL_COMPILE_STATUS, &resultFur);
+				if (resultFur == false)
+				{
+					glGetShaderInfoLog(vertexShaderFur, 1024, NULL, errorsFur);
+					std::cout << errorsFur << std::endl;
+				}
+				
+				// Create Fragment Shader Fur
+				fragmentShaderFur = glCreateShader(GL_FRAGMENT_SHADER);
+				glShaderSource(fragmentShaderFur, 1, &fragmentShaderFurSource, NULL);
+				glCompileShader(fragmentShaderFur);
+				glGetShaderiv(fragmentShaderFur, GL_COMPILE_STATUS, &resultFur);
+				if (resultFur == false)
+				{
+					glGetShaderInfoLog(fragmentShaderFur, 1024, NULL, errorsFur);
+					std::cout << errorsFur << std::endl;
+				}
+				// Create Geomtry Shader Fur
+				geometryShaderFur = glCreateShader(GL_GEOMETRY_SHADER);
+				glShaderSource(geometryShaderFur, 1, &geometryShaderFurSource, NULL);
+				glCompileShader(geometryShaderFur);
+				if (resultFur == false)
+				{
+					glGetShaderInfoLog(geometryShaderFur, 1024, NULL, errorsFur);
+					std::cout << errorsFur << std::endl;
+				}
+				// Create Executable Shader Fur Program
+				shaderExecutableFur = glCreateProgram();
+				glAttachShader(shaderExecutableFur, vertexShaderFur);
+				glAttachShader(shaderExecutableFur, fragmentShaderFur);
+				glAttachShader(shaderExecutableFur, geometryShaderFur);
+				glLinkProgram(shaderExecutableFur);
+				glGetProgramiv(shaderExecutableFur, GL_LINK_STATUS, &resultFur);
+				if (resultFur == false)
+				{
+					glGetProgramInfoLog(shaderExecutableFur, 1024, NULL, errorsFur);
+					std::cout << errorsFur << std::endl;
+				}
 			
 				
 			//}
@@ -561,19 +675,38 @@ void main()
 			for (int i = 0; i < models.size(); i++)
 			{
 				models[i].DrawModel(shaderExecutable, viewMat, projMat);
+				
 			}
 
 			//models[0].DrawModel(shaderExecutable, viewMat, projMat);
 
+			//Draw Horse with Fur
+			for (int j = 0; j < horseModels.size(); j++)
+			{
+
+			glUseProgram(shaderExecutableFur);
+			models[horseModels[j]].drawFur(shaderExecutableFur, viewMat, projMat);
+			//GLint locationVF = glGetUniformLocation(shaderExecutableFur, "view");
+			//glUniformMatrix4fv(locationVF, 1, GL_FALSE, (GLfloat*)&viewMat);
+			////Projection
+			//GLint locationPF = glGetUniformLocation(shaderExecutableFur, "projection");
+			//glUniformMatrix4fv(locationPF, 1, GL_FALSE, (GLfloat*)&projMat);
+			////Model
+			//
+			//GLint locationMF = glGetUniformLocation(shaderExecutableFur, "model");
+			//glUniformMatrix4fv(locationMF, 1, GL_FALSE, (GLfloat*)&models[horseModels[j]].worldPosition);
+
+			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
+			//glEnableVertexAttribArray(0);
+			//
+			//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)12);
+			//glEnableVertexAttribArray(1);
+			//for (int i = 0; i < models[horseModels[j]].parser.meshes.size(); i++)
+			//{
+			//glDrawElements(GL_TRIANGLES, models[horseModels[j]].parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * models[horseModels[j]].parser.batches[i].indexOffset));
+			//}
+			}
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-			//skyboxShader.use();
-			/*GW::MATH::GVECTORF viewTran; 
-			matMath.GetTranslationF(viewMat,viewTran);
-			viewTran.x = viewTran.x * -1;
-			viewTran.y = viewTran.y * -1;
-			viewTran.z = viewTran.z * -1;*/
-			/*GW::MATH::GMATRIXF SkyboxViewMatrix;
-			matMath.TranslateLocalF(viewMat,viewTran,SkyboxViewMatrix);*/
 
 			glUseProgram(shaderExecutableSkybox);
 			
@@ -605,23 +738,12 @@ void main()
 				//models[0].DrawModel(shaderExecutable, viewMat, projMat);
 
 				glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
-				//skyboxShader.use();
-				/*GW::MATH::GVECTORF viewTran;
-				matMath.GetTranslationF(viewMat,viewTran);
-				viewTran.x = viewTran.x * -1;
-				viewTran.y = viewTran.y * -1;
-				viewTran.z = viewTran.z * -1;*/
-				/*GW::MATH::GMATRIXF SkyboxViewMatrix;
-				matMath.TranslateLocalF(viewMat,viewTran,SkyboxViewMatrix);*/
-
 				glUseProgram(shaderExecutableSkybox);
-
 				GLint locationVS = glGetUniformLocation(shaderExecutableSkybox, "view");
 				glUniformMatrix4fv(locationVS, 1, GL_FALSE, (GLfloat*)&viewMat2);
 				//Projection
 				GLint locationPS = glGetUniformLocation(shaderExecutableSkybox, "projection");
 				glUniformMatrix4fv(locationPS, 1, GL_FALSE, (GLfloat*)&projMat);
-
 				// skybox cube
 				glBindVertexArray(skyboxVAO);
 				glActiveTexture(GL_TEXTURE0);
