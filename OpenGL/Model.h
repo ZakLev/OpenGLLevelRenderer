@@ -169,6 +169,7 @@ class Model
 public:
 	Model() {}
 		GW::MATH::GMATRIXF worldPosition = {};
+		//GW::I::GCollisionImplementation col;
 		std::string Name = {};
 		std::string NamePath = {};
 		H2B::Parser parser = {};
@@ -176,6 +177,7 @@ public:
 		std::chrono::microseconds FPSInput;
 		unsigned int screenHeight;
 		unsigned int screenWidth;
+			GW::MATH::GAABBMMF BB;
 		/*GW::MATH::GMATRIXF Model::GetWorldPosition() { return worldPosition; };
 		void Model::SetWorldPosition( GW::MATH::GMATRIXF& wp) { worldPosition = wp; };
 		*/
@@ -190,6 +192,7 @@ public:
 
 			win = _win;
 			ogl = _ogl;
+			//col.Create();
 			// TODO: part 2a
 			/*GIn.Create(win);
 			GCon.Create();*/
@@ -231,6 +234,7 @@ public:
 			UBO.camPos = cameraPos;
 
 
+			//col.ComputeAABBFromPointsF((GW::MATH::GVECTORF*)&parser.vertices,parser.vertexCount,BB);
 
 
 			// Link Needed OpenGL API functions

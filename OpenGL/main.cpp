@@ -5,6 +5,7 @@
 #define GATEWARE_ENABLE_MATH  // Math Library
 #define GATEWARE_ENABLE_INPUT
 #define GATEWARE_ENABLE_AUDIO
+#define GATEWARE_ENABLE_COLLISION
 // TODO: Part 2a
 // Ignore some GRAPHICS libraries we aren't going to use
 #define GATEWARE_DISABLE_GDIRECTX11SURFACE // we have another template for this

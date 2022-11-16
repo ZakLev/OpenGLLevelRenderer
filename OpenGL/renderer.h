@@ -228,6 +228,7 @@ void main()
 		GLuint shaderExecutableSkybox = 0;
 		//// TODO: Part 2a
 		GW::MATH::GMatrix matMath;
+		//GW::I::GCollisionImplementation colider;
 		//GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF viewMat2 = GW::MATH::GIdentityMatrixF;
@@ -330,10 +331,11 @@ void main()
 			matMath.Create();
 			GIn.Create(win);
 			GCon.Create();
+		//	colider.Create();
 			//	//World
 			////	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
 				//Camera
-				GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
+				GW::MATH::GVECTORF cameraPos = { 0.75f,5.25f,1.5f };
 				GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
 				GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
 				
@@ -719,6 +721,7 @@ void main()
 					glViewport(0, 0, screenWidth, screenHeight);
 			}
 			// TODO Part 4c
+			GW::MATH::GVECTORF cameraPositoin = viewMat.row4;
 			if (!viewLock)
 			{
 
@@ -755,7 +758,7 @@ void main()
 			GCon.GetState(0, G_RY_AXIS, yChangeCon);
 			GCon.GetState(0, G_RX_AXIS, xChangeCon);
 			//GIn.GetMouseDelta(mouseYChange);
-			if (splitScreen)
+			if (screenSplit)
 			{
 				
 				matMath.InverseF(viewMat2, viewMat2);
@@ -802,17 +805,27 @@ void main()
 			matMath.InverseF(viewMat, viewMat);
 			//prevTimeInput = currTime;
 			}
+			/*for (int i =0; i < models.size();i++)
+			{
+				float dist;
+				colider.SqDistancePointToAABBF(viewMat.row4, models[i].BB, dist);
+				if (dist == 0)
+				{
+					viewMat.row4 = cameraPositoin;
+					break;
+				}
+			}*/
 		}
-		unsigned int loadCubemap(std::vector<std::string> faces)
+		unsigned int loadCubemap(std::vector<std::string> imagePaths) // From Learn OpenGl
 		{
-			unsigned int textureID;
-			glGenTextures(1, &textureID);
-			glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+			unsigned int tID;
+			glGenTextures(1, &tID);
+			glBindTexture(GL_TEXTURE_CUBE_MAP, tID);
 
 			int width, height, nrChannels;
-			for (unsigned int i = 0; i < faces.size(); i++)
+			for (unsigned int i = 0; i < imagePaths.size(); i++)
 			{
-				unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+				unsigned char* data = stbi_load(imagePaths[i].c_str(), &width, &height, &nrChannels, 0);
 				if (data)
 				{
 					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -822,7 +835,7 @@ void main()
 				}
 				else
 				{
-					std::cout << "Cubemap tex failed to load at path: " << faces[i] << std::endl;
+					std::cout << "Cubemap tex failed to load at path: " << imagePaths[i] << std::endl;
 					stbi_image_free(data);
 				}
 			}
@@ -833,7 +846,7 @@ void main()
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		//	glTexParameteri(GL_TEXTURE_CUBE_MAP, WGL_TEXTURE_CUBE_MAP_NEGATIVE_Z_ARB, GL_CLAMP_TO_EDGE);
 
-			return textureID;
+			return tID;
 		}
 		void getFile()
 		{
