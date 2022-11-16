@@ -20,16 +20,11 @@ class Model
 	GLuint vertexBufferObject = 0;
 	// TODO: Part 1g
 	GLuint indiciesBuffer = 0;
-	//GLuint vertexShader = 0;
-	//GLuint fragmentShader = 0;
-	//GLuint shaderExecutable = 0;
+	
 	// TODO: Part 2c
 	GLuint uboBuffer = 0;
 	// TODO: Part 2a
-	//GW::MATH::GMatrix matMath;
-	//GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
-	//GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
-	//GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
+	
 	GW::MATH::GVECTORF lightDir = { -1,-1,-2,0 };
 	GW::MATH::GVECTORF lightColor = { 0.9f,0.9f,1,1 };
 	GW::MATH::GVECTORF lightAmbient = { 0.25f,0.25f,0.35f,1 };
@@ -60,12 +55,7 @@ public:
 		unsigned int screenHeight;
 		unsigned int screenWidth;
 			GW::MATH::GAABBMMF BB;
-		/*GW::MATH::GMATRIXF Model::GetWorldPosition() { return worldPosition; };
-		void Model::SetWorldPosition( GW::MATH::GMATRIXF& wp) { worldPosition = wp; };
-		*/
-		/*bool LoadModelData(const char* filePath) {
-			return parser.Parse(filePath);
-		}*/
+		
 		bool UploadModelDataToGPU(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl)
 		{
 			//int cm = 1;
@@ -74,29 +64,10 @@ public:
 
 			win = _win;
 			ogl = _ogl;
-			//col.Create();
-			// TODO: part 2a
-			/*GIn.Create(win);
-			GCon.Create();*/
-			//matMath.Create();
-		//	win.GetHeight(screenHeight);
-		//	win.GetWidth(screenWidth);
-			//World
-		//	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
+			
 			////Camera
 			GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
-			//GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
-			//GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
-			////	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
-			//	/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
-			//	matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
-
-			//matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
-			////matMath.InverseF(viewMat, viewMat);
-			////Projection
-			//_ogl.GOpenGLSurface::GetAspectRatio(AR);
-			//matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
-
+			
 			// TODO: Part 2b
 
 			UBO.sunDirection = lightDir;
@@ -116,7 +87,7 @@ public:
 			UBO.camPos = cameraPos;
 
 
-			//col.ComputeAABBFromPointsF((GW::MATH::GVECTORF*)&parser.vertices,parser.vertexCount,BB);
+			
 
 
 			// Link Needed OpenGL API functions
@@ -151,38 +122,7 @@ public:
 			memcpy(p, &UBO, sizeof(UBO));
 			glUnmapBuffer(GL_UNIFORM_BUFFER);
 
-			//// Create Vertex Shader
-			//vertexShader = glCreateShader(GL_VERTEX_SHADER);
-			//glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-			//glCompileShader(vertexShader);
-			//char errors[1024]; GLint result;
-			//glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &result);
-			//if (result == false)
-			//{
-			//	glGetShaderInfoLog(vertexShader, 1024, NULL, errors);
-			//	std::cout << errors << std::endl;
-			//}
-			//// Create Fragment Shader
-			//fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-			//glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-			//glCompileShader(fragmentShader);
-			//glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &result);
-			//if (result == false)
-			//{
-			//	glGetShaderInfoLog(fragmentShader, 1024, NULL, errors);
-			//	std::cout << errors << std::endl;
-			//}
-			//// Create Executable Shader Program
-			//shaderExecutable = glCreateProgram();
-			//glAttachShader(shaderExecutable, vertexShader);
-			//glAttachShader(shaderExecutable, fragmentShader);
-			//glLinkProgram(shaderExecutable);
-			//glGetProgramiv(shaderExecutable, GL_LINK_STATUS, &result);
-			//if (result == false)
-			//{
-			//	glGetProgramInfoLog(shaderExecutable, 1024, NULL, errors);
-			//	std::cout << errors << std::endl;
-			//}
+			
 			return 0;
 		}
 		void DrawModel(GLuint shaderExecutable,GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat )
@@ -195,10 +135,7 @@ public:
 			ftheta = deltaTime * 5;
 			prevTime = currTime;
 			// TODO: Part 2a
-			/*for (int cm = 0; cm < models.size(); cm++)
-			{
-				if (!models[cm].parser.materials.empty())
-				{*/
+			
 
 				// setup the pipeline
 			glUseProgram(shaderExecutable);
@@ -206,8 +143,7 @@ public:
 			UBO.viewMatrix = viewMat;
 				UBO.projectionMatrix = projMat;
 			GLint locationW = glGetUniformLocation(shaderExecutable, "world");
-			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
-			//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
+			
 			glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldPosition);
 			//Camera
 			GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
@@ -219,20 +155,16 @@ public:
 			// TODO: Part 1e
 			glBindVertexArray(vertexArray);
 			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			/*glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);*/
+			
 			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
 			glEnableVertexAttribArray(0);
-			//glUseProgram(shaderExecutable);
-			/*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);*/
+			
 			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)12);
 			glEnableVertexAttribArray(1);
-			//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			//glUseProgram(shaderExecutable);
-			/*glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);*/
+			
 			glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)24);
 			glEnableVertexAttribArray(2);
-			//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-			//glUseProgram(shaderExecutable);
+			
 			// now we can draw
 			// TODO: Part 1d
 			// TODO: Part 1h
@@ -252,17 +184,7 @@ public:
 			{
 
 				// TODO: Part 4d
-				if (i == 0)
-				{
-					//UBO.world = GW::MATH::GIdentityMatrixF;
-				}
-				/*else
-				{
-					matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(-ftheta), worldMat);
-					UBO.world = worldMat;
-				}*/
-				// TODO: Part 3c
-				//UBO.world = lvlData.worldPositions[cm];
+				
 				UBO.world = worldPosition;
 				
 				OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&parser.materials[i].attrib;
@@ -277,11 +199,7 @@ public:
 				glUnmapBuffer(GL_ARRAY_BUFFER);
 				glUseProgram(shaderExecutable);
 				// TODO: Part 4e
-			//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
-			//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
-
-			//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
-				//glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
+			
 				glDrawElements(GL_TRIANGLES, parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * parser.batches[i].indexOffset));
 				
 				/*}

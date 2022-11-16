@@ -228,33 +228,12 @@ void main()
 		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity, message);
 	}
 #endif
-	//LevelData lvlData;
-
-//std::vector<Model*> models = {};
 	
-	//void getModels(std::vector<Model*>& modelsData)
-	//{
-	////models.resize(modelsData.size());
-	//	/*models.reserve(modelsData.size());
-	//	for each (Model* m in modelsData)
-	//	{
-	//		
-	//		models.push_back(m);
-	//	}
-	//	models.shrink_to_fit();*/
-	//	/*for (int i = 0; i < modelsData.size(); i++)
-	//	{
-	//		models.resize(i + 1);
-	//		models[i] = modelsData[i];
-	//}*/
-	//	//models = modelsData;
-	//}
 // Creation, Rendering & Cleanup
 	class Renderer
 	{
 
-		//FileIO readFile;
-		//static LevelData lvlData;
+		
 		// proxy handles
 		GW::SYSTEM::GWindow win;
 		GW::GRAPHICS::GOpenGLSurface ogl;
@@ -262,13 +241,9 @@ void main()
 		GW::INPUT::GController GCon;
 		FileIO readFile;
 		std::string filePath = "";
-		//std::vector<Model*> models = {};
 		std::vector<Model> models = {};
 		//// what we need at a minimum to draw a triangle
-		//GLuint vertexArray = 0;
-		//GLuint vertexBufferObject = 0;
-		//// TODO: Part 1g
-		//GLuint indiciesBuffer = 0;
+		
 		GLuint vertexShader = 0;
 		GLuint fragmentShader = 0;
 		GLuint shaderExecutable = 0;
@@ -289,15 +264,12 @@ void main()
 		GLuint shaderExecutableFur = 0;
 		//// TODO: Part 2a
 		GW::MATH::GMatrix matMath;
-		//GW::I::GCollisionImplementation colider;
-		//GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
+		
 		GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF viewMat2 = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF viewMat3 = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
-		//GW::MATH::GVECTORF lightDir = { -1,-1,-2,0 };
-		//GW::MATH::GVECTORF lightColor = { 0.9f,0.9f,1,1 };
-		//GW::MATH::GVECTORF lightAmbient = { 0.25f,0.25f,0.35f,1 };
+		
 		float fov = G_DEGREE_TO_RADIAN_F(65.0f); float fNear = .1f; float fFar = 100.0f; float AR;
 		std::chrono::steady_clock::time_point prevTime;
 		std::chrono::microseconds FPS;
@@ -306,7 +278,7 @@ void main()
 		unsigned int screenHeight;
 		unsigned int screenWidth;
 		std::vector<int> horseModels;
-		//float ftheta = 0;
+		
 		//// TODO: Part 2b
 		struct UBO_DATA
 		{
@@ -365,27 +337,16 @@ void main()
 
 		};
 	public:
-		//Level Data
-		 //LevelData lvlData;
-
 
 		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl, char* fileName = "")
 		{
-			//int cm = 1;
-			///*for (int cm = 0; cm < models.size(); cm++)
-			//{*/
-
+			
 				win = _win;
 				ogl = _ogl;
 				filePath = fileName;
-				/*if (filePath.compare(""))
-				{
-				readFile.ReadGameLevel(models);
-				}
-				else
-				{*/
+				
 				readFile.ReadGameLevel(models, filePath.c_str());
-				//}
+		
 
 				
 			//	// TODO: part 2a
@@ -393,23 +354,23 @@ void main()
 			matMath.Create();
 			GIn.Create(win);
 			GCon.Create();
-		//	colider.Create();
+		
 			//	//World
-			////	matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(ftheta), worldMat);
+			
 				//Camera
-				GW::MATH::GVECTORF cameraPos = { 0.75f,5.25f,1.5f };
-				GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
+				GW::MATH::GVECTORF cameraPos = { 1.75f,5.25f,1.5f };
+				GW::MATH::GVECTORF cameraRot = { 1.75f,0.0f,0.0f };
 				GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
 				
 
 				matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
 
 				GW::MATH::GVECTORF cameraPos2 = { 0.75f,25.0f,1.5f };
-				GW::MATH::GVECTORF cameraRot2 = { -0.15f,-.75f,0.0f };
+				GW::MATH::GVECTORF cameraRot2 = { 0.0f,0.0f,0.0f };
 				GW::MATH::GVECTORF cameraUp2 = { 0.0f,1.0f,0.0f };
 				
 
-				matMath.LookAtRHF(cameraPos2, cameraRot, cameraUp2, viewMat2);
+				matMath.LookAtRHF(cameraPos2, cameraRot2, cameraUp2, viewMat2);
 				viewMat3 = viewMat2;
 				//Projection
 				_ogl.GOpenGLSurface::GetAspectRatio(AR);
@@ -418,18 +379,13 @@ void main()
 
 			//	// TODO: Part 2b
 
-			//	UBO.sunDirection = lightDir;
-			//	UBO.sunColor = lightColor;
+			
 				UBO.viewMatrix = viewMat;
 				UBO.projectionMatrix = projMat;
-			//	UBO.world = worldMat;
-			//	UBO.material = FSLogo_materials[0].attrib;
-			//	//UBO.material = (OB)lvlData.parsers[0].materials[0].attrib;
+			
 
 
-			//	// TODO: Part 4e
-			//	UBO.sunAmbient = lightAmbient;
-			//	UBO.camPos = cameraPos;
+			
 				// Link Needed OpenGL API functions
 				LoadExtensions();
 				// In debug mode we link openGL errors to the console
@@ -437,38 +393,13 @@ void main()
 				glEnable(GL_DEBUG_OUTPUT);
 				glDebugMessageCallback(MessageCallback, 0);
 #endif
-				// TODO: Part 1c
-				//glGenVertexArrays(1, &vertexArray);
-				//glGenBuffers(1, &vertexBufferObject);
-				//glBindVertexArray(vertexArray);
-				//glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-				//glBufferData(GL_ARRAY_BUFFER, sizeof(models[cm].parser.vertices), (void*)&models[cm].parser.vertices, GL_STATIC_DRAW);
-				//glBufferData(GL_ARRAY_BUFFER, sizeof(H2B::VERTEX) * models[cm].parser.vertices.size(), models[cm].parser.vertices.data(), GL_STATIC_DRAW);
-				//// TODO: Part 1g
-				//glGenBuffers(1, &indiciesBuffer);
-				//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-				//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(H2B::VERTEX) * (models[cm].parser.indices.size()), models[cm].parser.indices.data(), GL_STATIC_DRAW);
-				// TODO: Part 2c
-				//models[1].UploadModelDataToGPU(win, ogl);
-			  // models[29].UploadModelDataToGPU(win, ogl);
+				
 			    for (int i = 0; i < models.size(); i++)
 			   {
 				   models[i].UploadModelDataToGPU(win,ogl);
 				   if (models[i].Name.compare("Statue_Horse") == 0)
 					   horseModels.push_back(i);
 			   }
-
-				//glGenBuffers(1, &uboBuffer);
-				//glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-				//glBufferData(GL_UNIFORM_BUFFER, sizeof(UBO), &UBO, GL_DYNAMIC_DRAW);
-				//glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-				////glBindBuffer(GL_UNIFORM_BUFFER, uboBuffer);
-				//GLuint binding_point_index = 0;
-				//glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-				//GLvoid* p = glMapBuffer(GL_UNIFORM_BUFFER, GL_WRITE_ONLY);
-				//memcpy(p, &UBO, sizeof(UBO));
-				//glUnmapBuffer(GL_UNIFORM_BUFFER);
 
 				// Create Vertex Shader
 				vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -627,32 +558,12 @@ void main()
 					glGetProgramInfoLog(shaderExecutableFur, 1024, NULL, errorsFur);
 					std::cout << errorsFur << std::endl;
 				}
-			
-				
-			//}
-			/*	for (int i = 0; i < models.size(); i++)
-				{
-					if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
-						models[i]->UploadModelDataToGPU(win,ogl);
-				}*/
-				/*for each (Model m in models)
-				{
-					m.UploadModelDataToGPU(win, ogl);
-				}*/
-
-//models[0]->UploadModelDataToGPU(win, ogl);
-
-            //  models[1]->UploadModelDataToGPU(win, ogl);
-                /* for (int i = 0; i < models.size(); i++)
-                 {
-					 models[i].UploadModelDataToGPU(win,ogl);
-				 }*/
 
 		}
 		void Render()
 		{
 
-			//models[0]->DrawModel();
+			
 			//	//Get Delta Time
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
@@ -662,41 +573,20 @@ void main()
 			{
 				glViewport(0, 0, screenWidth / 2, screenHeight);
 			}
-			//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
-			//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
+			
 			for (int i = 0; i < models.size(); i++)
 			{
 				models[i].DrawModel(shaderExecutable, viewMat, projMat);
 				
 			}
 
-			//models[0].DrawModel(shaderExecutable, viewMat, projMat);
+		
 
 			//Draw Horse with Fur
 			for (int j = 0; j < horseModels.size(); j++)
 			{
-
 			glUseProgram(shaderExecutableFur);
 			models[horseModels[j]].drawFur(shaderExecutableFur, viewMat, projMat);
-			//GLint locationVF = glGetUniformLocation(shaderExecutableFur, "view");
-			//glUniformMatrix4fv(locationVF, 1, GL_FALSE, (GLfloat*)&viewMat);
-			////Projection
-			//GLint locationPF = glGetUniformLocation(shaderExecutableFur, "projection");
-			//glUniformMatrix4fv(locationPF, 1, GL_FALSE, (GLfloat*)&projMat);
-			////Model
-			//
-			//GLint locationMF = glGetUniformLocation(shaderExecutableFur, "model");
-			//glUniformMatrix4fv(locationMF, 1, GL_FALSE, (GLfloat*)&models[horseModels[j]].worldPosition);
-
-			//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)0);
-			//glEnableVertexAttribArray(0);
-			//
-			//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(H2B::VERTEX), (void*)12);
-			//glEnableVertexAttribArray(1);
-			//for (int i = 0; i < models[horseModels[j]].parser.meshes.size(); i++)
-			//{
-			//glDrawElements(GL_TRIANGLES, models[horseModels[j]].parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * models[horseModels[j]].parser.batches[i].indexOffset));
-			//}
 			}
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 
@@ -720,14 +610,17 @@ void main()
 			{
 				glViewport(screenWidth / 2, 0, screenWidth / 2, screenHeight);
 				glUseProgram(shaderExecutable);
-				//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
-				//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
+				
 				for (int i = 0; i < models.size(); i++)
 				{
 					models[i].DrawModel(shaderExecutable, viewMat2, projMat);
 				}
-
-				//models[0].DrawModel(shaderExecutable, viewMat, projMat);
+				//Draw Fur
+				for (int j = 0; j < horseModels.size(); j++)
+				{
+					glUseProgram(shaderExecutableFur);
+					models[horseModels[j]].drawFur(shaderExecutableFur, viewMat2, projMat);
+				}
 
 				glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 				glUseProgram(shaderExecutableSkybox);
@@ -917,6 +810,7 @@ void main()
 			}
 			// TODO Part 4c
 			matMath.InverseF(viewMat, viewMat);
+			
 			//prevTimeInput = currTime;
 			}
 			/*for (int i =0; i < models.size();i++)
