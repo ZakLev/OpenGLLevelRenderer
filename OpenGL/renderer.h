@@ -99,23 +99,15 @@ layout(row_major) uniform UBO_DATA
     vec4 sunAmbient, camPos;
 };
 
-
-
-
 // TODO: Part 4e
 // TODO: Part 4b
 in vec3 world_nrm;
 in vec3 worldPos;
-//out vec4 FragColor;
-
-//in vec3 TexCoords;
-//in vec3 textureDir; // direction vector representing a 3D texture coordinate
-//uniform samplerCube skybox; // cubemap texture sampler
 
 void main() 
 {	
 	// TODO: Part 3a
-	//Pixel = vec4(170/255.0f, 170/255.0f, 44/255.0f, 1); // TODO: Part 1a
+
     vec4 color = vec4(material.Kd,1);
 vec3 nrm = normalize(world_nrm);
 float diff = max(dot(nrm, normalize(-sunDirection.xyz)), 0);
@@ -128,8 +120,6 @@ vec3 camDir = normalize(camPos.xyz - posW.xyz );
 vec3 specular = spec * material.Ks;
 vec3 diffuse = (sunAmbient.xyz  + (diff* sunColor.xyz) ) * color.xyz + specular;
 Pixel = vec4(diffuse,1);
-//Pixel = vec4(diffuse,1) * color;
- //FragColor = texture(skybox, TexCoords);
 }
 )";
 const char* vertexShaderSkyboxSource = R"(
@@ -194,7 +184,9 @@ const char* fragmentShaderFurSource = R"(
 
 void main()
 {
-    FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+    FragColor = vec4(0.02, 0.07, 0.22, 1.0);
+ 
+
 }
 )";
 const char* geometryShaderFurSource = R"(
