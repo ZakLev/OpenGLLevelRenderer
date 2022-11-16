@@ -230,6 +230,8 @@ void main()
 		GW::MATH::GMatrix matMath;
 		//GW::MATH::GMATRIXF worldMat = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF viewMat = GW::MATH::GIdentityMatrixF;
+		GW::MATH::GMATRIXF viewMat2 = GW::MATH::GIdentityMatrixF;
+		GW::MATH::GMATRIXF viewMat3 = GW::MATH::GIdentityMatrixF;
 		GW::MATH::GMATRIXF projMat = GW::MATH::GIdentityMatrixF;
 		//GW::MATH::GVECTORF lightDir = { -1,-1,-2,0 };
 		//GW::MATH::GVECTORF lightColor = { 0.9f,0.9f,1,1 };
@@ -237,6 +239,8 @@ void main()
 		float fov = G_DEGREE_TO_RADIAN_F(65.0f); float fNear = .1f; float fFar = 100.0f; float AR;
 		std::chrono::steady_clock::time_point prevTime;
 		std::chrono::microseconds FPS;
+		bool screenSplit = false;
+		bool viewLock = false;
 		unsigned int screenHeight;
 		unsigned int screenWidth;
 		//float ftheta = 0;
@@ -332,14 +336,20 @@ void main()
 				GW::MATH::GVECTORF cameraPos = { 0.75f,0.25f,1.5f };
 				GW::MATH::GVECTORF cameraRot = { 0.15f,0.75f,0.0f };
 				GW::MATH::GVECTORF cameraUp = { 0.0f,1.0f,0.0f };
-				//	matMath.TranslateLocalF(viewMat, cameraPos, viewMat);
-					/*matMath.RotateXGlobalF(viewMat,cameraRot.x,viewMat);
-					matMath.RotateYLocalF(viewMat, cameraRot.y, viewMat);*/
+				
 
 				matMath.LookAtRHF(cameraPos, cameraRot, cameraUp, viewMat);
-				//matMath.InverseF(viewMat, viewMat);
+
+				GW::MATH::GVECTORF cameraPos2 = { 0.75f,25.0f,1.5f };
+				GW::MATH::GVECTORF cameraRot2 = { -0.15f,-.75f,0.0f };
+				GW::MATH::GVECTORF cameraUp2 = { 0.0f,1.0f,0.0f };
+				
+
+				matMath.LookAtRHF(cameraPos2, cameraRot, cameraUp2, viewMat2);
+				viewMat3 = viewMat2;
 				//Projection
 				_ogl.GOpenGLSurface::GetAspectRatio(AR);
+				
 				matMath.ProjectionOpenGLRHF(fov, AR, fNear, fFar, projMat);
 
 			//	// TODO: Part 2b
@@ -540,6 +550,10 @@ void main()
 			float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
 			prevTime = currTime;
 			glUseProgram(shaderExecutable);
+			if (screenSplit)
+			{
+				glViewport(0, 0, screenWidth / 2, screenHeight);
+			}
 			//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
 			//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
 			for (int i = 0; i < models.size(); i++)
@@ -575,133 +589,49 @@ void main()
 			glDrawArrays(GL_TRIANGLES, 0, 36);
 			glBindVertexArray(0);
 			glDepthFunc(GL_LESS); // set depth function back to default
+			if (screenSplit)
+			{
+				glViewport(screenWidth / 2, 0, screenWidth / 2, screenHeight);
+				glUseProgram(shaderExecutable);
+				//models[1].DrawModel(shaderExecutable, viewMat, projMat, uboBuffer);
+				//models[29].DrawModel(shaderExecutable,viewMat,projMat,uboBuffer);
+				for (int i = 0; i < models.size(); i++)
+				{
+					models[i].DrawModel(shaderExecutable, viewMat2, projMat);
+				}
+
+				//models[0].DrawModel(shaderExecutable, viewMat, projMat);
+
+				glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
+				//skyboxShader.use();
+				/*GW::MATH::GVECTORF viewTran;
+				matMath.GetTranslationF(viewMat,viewTran);
+				viewTran.x = viewTran.x * -1;
+				viewTran.y = viewTran.y * -1;
+				viewTran.z = viewTran.z * -1;*/
+				/*GW::MATH::GMATRIXF SkyboxViewMatrix;
+				matMath.TranslateLocalF(viewMat,viewTran,SkyboxViewMatrix);*/
+
+				glUseProgram(shaderExecutableSkybox);
+
+				GLint locationVS = glGetUniformLocation(shaderExecutableSkybox, "view");
+				glUniformMatrix4fv(locationVS, 1, GL_FALSE, (GLfloat*)&viewMat2);
+				//Projection
+				GLint locationPS = glGetUniformLocation(shaderExecutableSkybox, "projection");
+				glUniformMatrix4fv(locationPS, 1, GL_FALSE, (GLfloat*)&projMat);
+
+				// skybox cube
+				glBindVertexArray(skyboxVAO);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+				glUseProgram(shaderExecutableSkybox);
+				glDrawArrays(GL_TRIANGLES, 0, 36);
+				glBindVertexArray(0);
+				glDepthFunc(GL_LESS); // set depth function back to default
+			}
 			
-			//glBindVertexArray(0);
-			/*for (int i = 0; i < models.size(); i++)
-			{
-				models[i].DrawModel();
-			}*/
-			/*for (int i = 0; i < models.size();i++)
-			{
-				if (i != 6 && i != 24 && i != 25 && i != 54 && i != 56 && i != 60 && i != 62 && i != 63 && i != 79)
-				models[i]->DrawModel();
-			}*/
-			/*for each (Model * m in models)
-			{
-				m->UpdateCamera(deltaTime);
-			}*/
-			/*for each (Model m in models)
-			{
-				m.DrawModel();
-			}*/
-		//	int cm = 1;
-		//	//Get Delta Time
-		//	std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
-		//	float deltaTime = std::chrono::duration_cast<std::chrono::microseconds>(currTime - prevTime).count() / 100000.0f;
-		//	ftheta = deltaTime * 5;
-		//	prevTime = currTime;
-		//	// TODO: Part 2a
-		//	/*for (int cm = 0; cm < models.size(); cm++)
-		//	{
-		//		if (!models[cm].parser.materials.empty())
-		//		{*/
-
-		//	// setup the pipeline
-		//	//World
-		//	GLint locationW = glGetUniformLocation(shaderExecutable, "world");
-		//	//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&worldMat);
-		//	//glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&lvlData.worldPositions[cm]);
-		//	glUniformMatrix4fv(locationW, 1, GL_FALSE, (GLfloat*)&models[cm].worldPosition);
-		//	//Camera
-			//GLint locationV = glGetUniformLocation(shaderExecutable, "viewMatrix");
-			//glUniformMatrix4fv(locationV, 1, GL_FALSE, (GLfloat*)&viewMat);
-			////Projection
-			//GLint locationP = glGetUniformLocation(shaderExecutable, "projectionMatrix");
-			//glUniformMatrix4fv(locationP, 1, GL_FALSE, (GLfloat*)&projMat);
-
-		//	// TODO: Part 1e
-		//	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)0);
-		//	glEnableVertexAttribArray(0);
-		//	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		//	glUseProgram(shaderExecutable);
-		//	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)12);
-		//	glEnableVertexAttribArray(1);
-		//	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		//	glUseProgram(shaderExecutable);
-		//	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void*)24);
-		//	glEnableVertexAttribArray(2);
-		//	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferObject);
-		//	glUseProgram(shaderExecutable);
-		//	// now we can draw
-		//	glBindVertexArray(vertexArray);
-		//	glUseProgram(shaderExecutable);
-		//	// TODO: Part 1d
-		//	// TODO: Part 1h
-
-		//	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-		//	glUseProgram(shaderExecutable);
-		//	// TODO: Part 2e
-		//	unsigned int block_index = glGetUniformBlockIndex(shaderExecutable, "UBO");
-		//	// TODO: Part 2f
-		//	GLuint binding_point_index = 0;
-		//	glBindBufferBase(GL_UNIFORM_BUFFER, binding_point_index, uboBuffer);
-		//	// TODO: Part 2g
-		//	glUniformBlockBinding(shaderExecutable, block_index, 0);
-		//	// TODO: Part 3b
-		////	for (int i = 0; i < lvlData.parsers[cm].meshCount; i++)
-		//		for (int i = 0; i < models[cm].parser.meshCount; i++)
-		//	{
-
-		//		// TODO: Part 4d
-		//		if (i == 0)
-		//		{
-		//			//UBO.world = GW::MATH::GIdentityMatrixF;
-		//		}
-		//		/*else
-		//		{
-		//			matMath.RotateYLocalF(worldMat, G_DEGREE_TO_RADIAN_F(-ftheta), worldMat);
-		//			UBO.world = worldMat;
-		//		}*/
-		//		// TODO: Part 3c
-		//		//UBO.world = lvlData.worldPositions[cm];
-		//		UBO.world = models[cm].worldPosition;
-		//		//UBO.world = GW::MATH::GIdentityMatrixF;
-		//			//UBO.material = FSLogo_materials[i].attrib;
-		//		//OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&lvlData.parsers[cm].materials[i].attrib;
-		//		OBJ_ATTRIBUTES* obj = (OBJ_ATTRIBUTES*)&models[cm].parser.materials[i].attrib;
-		//		UBO.material = *obj;
-
-		//		glBindBuffer(GL_ARRAY_BUFFER, uboBuffer);
-		//		// get pointer
-		//		void* ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-		//		// now copy data into memory
-		//		memcpy(ptr, &UBO, sizeof(UBO));
-		//		// make sure to tell OpenGL we're done with the pointer
-		//		glUnmapBuffer(GL_ARRAY_BUFFER);
-
-		//		// TODO: Part 4e
-		//	//glDrawArrays(GL_TRIANGLES, 0, FSLogo_vertexcount);
-		//	//glDrawArrays(GL_INDEX_ARRAY, 0, FSLogo_indexcount);
-
-		//	//glDrawElements(GL_TRIANGLES, FSLogo_batches[i][0], GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int)*FSLogo_batches[i][1]));
-		//		//glDrawElements(GL_TRIANGLES, lvlData.parsers[cm].batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * lvlData.parsers[cm].batches[i].indexOffset));
-		//		glDrawElements(GL_TRIANGLES, models[cm].parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * models[cm].parser.batches[i].indexOffset));
-		//	/*}
-		//		}*/
-		//	// some video cards(cough Intel) need this set back to zero or they won't display
-		//	}
-		//	glBindVertexArray(0);
 		}
-		/*void data(LevelData& Data)
-		{
-			
-			lvlData = Data;
-		}*/
-		/*void transferData(std::vector<Model>& modelsData)
-		{
-
-			models = modelsData;
-		}*/
+		
 		void UpdateCamera(bool& changeLevel,char*& fileName, bool& playSound)
 		{
 
@@ -713,6 +643,13 @@ void main()
 			float levelChange1 = 0;
 			float playAug = 0;
 			float fileOpen = 0;
+			float changeView = 0;
+			float splitScreen = 0;
+			float unsplitScreen = 0;
+			float lockView = 0;
+			float unlockView = 0;
+			
+			
 			GIn.GetState(G_KEY_4, levelChange2);
 			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
 			{
@@ -744,9 +681,47 @@ void main()
 				//IFileOpenDialog *fileOpen;
 
 			}
+			GIn.GetState(G_KEY_F2, changeView);
+			if (changeView != 0)
+			{
+				viewMat = viewMat3;
+				changeView = 0;
+				//IFileOpenDialog *fileOpen;
+
+			}
+			GIn.GetState(G_KEY_ESCAPE, lockView);
+			if (lockView != 0 && viewLock!= true)
+			{
+				viewLock = true;
+				lockView = 0;
+
+			}
+			GIn.GetState(G_KEY_TILDE, unlockView);
+			if (unlockView != 0 && viewLock != false)
+			{
+				viewLock = false;
+				unlockView = 0;
+
+			}
 			win.GetHeight(screenHeight);
 			win.GetWidth(screenWidth);
+			GIn.GetState(G_KEY_F3, splitScreen);
+			if (splitScreen != 0 && screenSplit != true)
+			{
+					screenSplit = true;
+					glViewport(screenWidth / 2, 0, screenWidth / 2, screenHeight);
+					splitScreen = 0;
+			}
+			GIn.GetState(G_KEY_F4, unsplitScreen);
+			if (unsplitScreen != 0 && screenSplit != false)
+			{
+					screenSplit = false;
+					glViewport(0, 0, screenWidth, screenHeight);
+			}
 			// TODO Part 4c
+			if (!viewLock)
+			{
+
 			matMath.InverseF(viewMat, viewMat);
 			// TODO: Part 4d
 			float yChange = 0.0f; float yChangeCon = 0.0f; float yChangeNeg = 0.0f; float yChangeNegCon = 0.0f;
@@ -780,6 +755,34 @@ void main()
 			GCon.GetState(0, G_RY_AXIS, yChangeCon);
 			GCon.GetState(0, G_RX_AXIS, xChangeCon);
 			//GIn.GetMouseDelta(mouseYChange);
+			if (splitScreen)
+			{
+				
+				matMath.InverseF(viewMat2, viewMat2);
+			
+				float yChange2 = 0.0f;  float yChangeNeg2 = 0.0f;
+				GIn.GetState(G_KEY_ENTER, yChange2);
+			
+				GIn.GetState(G_KEY_RIGHTSHIFT, yChangeNeg2);
+				
+				
+				viewMat2.row4.y += ((yChange2 - yChangeNeg2)* cameraSpeed * SPSLF);
+
+				// TODO: Part 4e
+				float zChange2 = 0.0f; float zChangeNeg2 = 0.0f; float xChange2 = 0.0f; float xChangeNeg2 = 0.0f;
+				
+				GIn.GetState(G_KEY_RIGHT, xChange2);
+				GIn.GetState(G_KEY_LEFT, xChangeNeg2);
+				GIn.GetState(G_KEY_DOWN, zChange2);
+				GIn.GetState(G_KEY_UP, zChangeNeg2);
+				
+
+				GW::MATH::GVECTORF translationVec2 = { ((xChange2 - xChangeNeg2)) * cameraSpeed * SPSLF, 0.0f, ((zChange2 - zChangeNeg2)) * cameraSpeed * SPSLF, 0.0f };
+				matMath.TranslateLocalF(viewMat2, translationVec2, viewMat2);
+				// TODO: Part 4f 
+				matMath.InverseF(viewMat2, viewMat2);
+
+			}
 			if (G_PASS(res) && res != GW::GReturn::REDUNDANT)
 			{
 				float totalPitch = fov * ((mouseYChange / screenHeight) + conYChange) * -speed;
@@ -798,6 +801,7 @@ void main()
 			// TODO Part 4c
 			matMath.InverseF(viewMat, viewMat);
 			//prevTimeInput = currTime;
+			}
 		}
 		unsigned int loadCubemap(std::vector<std::string> faces)
 		{
