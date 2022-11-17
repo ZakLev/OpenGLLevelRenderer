@@ -16,5 +16,5 @@ if (UNIX AND NOT APPLE)
      link_libraries(${OPENGL_LIBRARIES})
 endif()
 
-add_executable (OpenGLLevelRenderer main.cpp renderer.h FileIO.h Model.h h2bParser.h)
+add_executable (OpenGLLevelRenderer main.cpp renderer.h FileIO.h Model.h h2bParser.h stb_image.h)
 
