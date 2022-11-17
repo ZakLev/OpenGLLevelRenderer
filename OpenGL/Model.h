@@ -208,7 +208,7 @@ public:
 			}
 			//glBindVertexArray(0);
 		}
-		void drawFur(GLuint shaderExecutableFur, GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat)
+		void drawFur(GLuint shaderExecutableFur, GW::MATH::GMATRIXF viewMat, GW::MATH::GMATRIXF projMat, bool horseOnly = true)
 		{
 			GLint locationVF = glGetUniformLocation(shaderExecutableFur, "view");
 			glUniformMatrix4fv(locationVF, 1, GL_FALSE, (GLfloat*)&viewMat);
@@ -233,12 +233,18 @@ public:
 			glEnableVertexAttribArray(2);
 			
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indiciesBuffer);
-			
+			if (horseOnly)
+			{
 			glDrawElements(GL_TRIANGLES, parser.batches[1].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * parser.batches[1].indexOffset));
-			/*for (int i = 0; i < parser.meshes.size(); i++)
+			}
+			else
+			{
+
+			for (int i = 0; i < parser.meshes.size(); i++)
 			{
 				glDrawElements(GL_TRIANGLES, parser.batches[i].indexCount, GL_UNSIGNED_INT, (GLvoid*)(sizeof(unsigned int) * parser.batches[i].indexOffset));
-			}*/
+			}
+			}
 		}
 		
 	~Model()

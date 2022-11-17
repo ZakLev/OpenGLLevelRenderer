@@ -7,6 +7,8 @@
 #include "Model.h"
 #include "FileIO.h"
 
+
+
 // Simple Vertex Shader
 const char* vertexShaderSource = R"(
 #version 330 // GLSL 3.30
@@ -275,6 +277,7 @@ void main()
 		std::chrono::microseconds FPS;
 		bool screenSplit = false;
 		bool viewLock = false;
+		bool renderNormals = false;
 		unsigned int screenHeight;
 		unsigned int screenWidth;
 		std::vector<int> horseModels;
@@ -338,7 +341,7 @@ void main()
 		};
 	public:
 
-		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl, char* fileName = "")
+		Renderer(GW::SYSTEM::GWindow _win, GW::GRAPHICS::GOpenGLSurface _ogl, const char* fileName = "")
 		{
 			
 				win = _win;
@@ -467,25 +470,8 @@ void main()
 					std::cout << errorsSkybox << std::endl;
 				}
 				std::vector<std::string> faces;
-				if (filePath.compare("../../Assets/GameLevel.txt") == 0)
-				{
-
 				
-						std::string right = "../../Assets/skybox/right.jpg";
-						std::string left = "../../Assets/skybox/left.jpg";
-						std::string top = "../../Assets/skybox/top.jpg";
-						std::string bottom = "../../Assets/skybox/bottom.jpg";
-						std::string front = "../../Assets/skybox/front.jpg";
-						std::string back ="../../Assets/skybox/back.jpg";
-						faces.push_back(right);
-						faces.push_back(left);
-						faces.push_back(top);
-						faces.push_back(bottom);
-						faces.push_back(front);
-						faces.push_back(back);
-				
-				}
-				else if (filePath.compare("../../Assets/GameLevel2.txt") == 0)
+				 if (filePath.compare("../../Assets/GameLevel2.txt") == 0)
 				{
 					std::string right = "../../Assets/skybox2/right.jpg";
 					std::string left = "../../Assets/skybox2/left.jpg";
@@ -500,6 +486,24 @@ void main()
 					faces.push_back(front);
 					faces.push_back(back);
 				}
+				 else 
+				 {
+
+
+					 std::string right = "../../Assets/skybox/right.jpg";
+					 std::string left = "../../Assets/skybox/left.jpg";
+					 std::string top = "../../Assets/skybox/top.jpg";
+					 std::string bottom = "../../Assets/skybox/bottom.jpg";
+					 std::string front = "../../Assets/skybox/front.jpg";
+					 std::string back = "../../Assets/skybox/back.jpg";
+					 faces.push_back(right);
+					 faces.push_back(left);
+					 faces.push_back(top);
+					 faces.push_back(bottom);
+					 faces.push_back(front);
+					 faces.push_back(back);
+
+				 }
 				 cubemapTexture = loadCubemap(faces);
 
 				// skybox VAO
@@ -581,12 +585,24 @@ void main()
 			}
 
 		
-
-			//Draw Horse with Fur
-			for (int j = 0; j < horseModels.size(); j++)
+			if (!renderNormals)
 			{
-			glUseProgram(shaderExecutableFur);
-			models[horseModels[j]].drawFur(shaderExecutableFur, viewMat, projMat);
+				//Draw Horse with Fur
+				for (int j = 0; j < horseModels.size(); j++)
+				{
+					glUseProgram(shaderExecutableFur);
+					models[horseModels[j]].drawFur(shaderExecutableFur, viewMat, projMat);
+				}
+			}
+			else
+			{
+				//Draw Fur on Everything/ Normals
+				for (int j = 0; j < models.size(); j++)
+				{
+					glUseProgram(shaderExecutableFur);
+					models[j].drawFur(shaderExecutableFur, viewMat, projMat, false);
+				}
+
 			}
 			glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
 
@@ -616,10 +632,23 @@ void main()
 					models[i].DrawModel(shaderExecutable, viewMat2, projMat);
 				}
 				//Draw Fur
+				if (!renderNormals)
+				{
+
 				for (int j = 0; j < horseModels.size(); j++)
 				{
 					glUseProgram(shaderExecutableFur);
 					models[horseModels[j]].drawFur(shaderExecutableFur, viewMat2, projMat);
+				}
+				}
+				else
+				{
+					//Draw Fur on Everything/ Normals
+					for (int j = 0; j < models.size(); j++)
+					{
+						glUseProgram(shaderExecutableFur);
+						models[j].drawFur(shaderExecutableFur, viewMat2, projMat, false);
+					}
 				}
 
 				glDepthFunc(GL_LEQUAL);  // change depth function so depth test passes when values are equal to depth buffer's content
@@ -641,7 +670,7 @@ void main()
 			
 		}
 		
-		void UpdateCamera(bool& changeLevel,char*& fileName, bool& playSound)
+		void UpdateCamera(bool& changeLevel,char*& fileName, bool& playSound, bool& PlaySong,std::string& file)
 		{
 
 			std::chrono::steady_clock::time_point currTime = std::chrono::high_resolution_clock::now();
@@ -657,8 +686,10 @@ void main()
 			float unsplitScreen = 0;
 			float lockView = 0;
 			float unlockView = 0;
-			
-			
+			float normalsOn = 0;
+			float normalsOff = 0;
+			float pauseMusic = 0;
+			float playMusic = 0;
 			GIn.GetState(G_KEY_4, levelChange2);
 			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
 			{
@@ -684,11 +715,16 @@ void main()
 			GIn.GetState(G_KEY_F1, fileOpen);
 			if (fileOpen != 0)
 			{
-				changeLevel = true;
-				
+				//changeLevel = true;
+				std::string newPath = readFile.OpenFile("*.txt*", win);
+				std::string holder;
+				if (newPath!="")
+				{
+					changeLevel = true;
+					 file  = newPath;
+				}
+			
 				fileOpen = 0;
-				//IFileOpenDialog *fileOpen;
-
 			}
 			GIn.GetState(G_KEY_F2, changeView);
 			if (changeView != 0)
@@ -726,6 +762,30 @@ void main()
 			{
 					screenSplit = false;
 					glViewport(0, 0, screenWidth, screenHeight);
+			}
+			GIn.GetState(G_KEY_F5, normalsOn);
+			if (normalsOn != 0 && renderNormals != true)
+			{
+				renderNormals = true;
+				normalsOn = 0;
+			}
+			GIn.GetState(G_KEY_F6, normalsOff);
+			if (normalsOff != 0 && renderNormals != false)
+			{
+				renderNormals = false;
+				normalsOff = 0;
+			}
+			GIn.GetState(G_KEY_9, playMusic);
+			if (playMusic != 0 && PlaySong != true)
+			{
+				PlaySong = true;
+				playMusic = 0;
+			}
+			GIn.GetState(G_KEY_0, pauseMusic);
+			if (pauseMusic != 0 && PlaySong != false)
+			{
+				PlaySong = false;
+				pauseMusic = 0;
 			}
 			// TODO Part 4c
 			GW::MATH::GVECTORF cameraPositoin = viewMat.row4;
@@ -836,10 +896,13 @@ void main()
 				unsigned char* data = stbi_load(imagePaths[i].c_str(), &width, &height, &nrChannels, 0);
 				if (data)
 				{
+						glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+
 					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
 						0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
 					);
 					stbi_image_free(data);
+				
 				}
 				else
 				{

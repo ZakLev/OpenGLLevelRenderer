@@ -37,32 +37,16 @@ int main()
 	bool playSound = false;
 	bool soundOver = false;
 	bool openDialogue = false;
+	bool PlayMusic = true;
 	int level = 0;
 	char* filePath = "../../Assets/GameLevel.txt";
+	std::string file = "";
 	char* musicPath = "../../Assets/Music/OOOF.wav";
 	char* soundPath = "../../Assets/Sound/AUG.wav";
 	GW::AUDIO::GMusic song;
 	GW::AUDIO::GAudio aud;
 	GW::AUDIO::GSound sou;
-	//FileIO readFile;
-   // LevelData data;
-	//std::vector<Model*> models = {};
-	//readFile.ReadGameLevel(data.worldPositions, data.Names, data.parsers);
-	//readFile.ReadGameLevel(models);
-	/*Renderer renderer;
-	renderer.transferData(models);*/
-	//getModels(models);
 	
-	//renderer.data(data);
-	//H2B::Parser parser;
-	/*std::vector<GW::MATH::GMATRIXF> worldPositions = {};
-	std::vector<std::string> Names = {};
-	std::vector<H2B::Parser> parsers = {};*/
-	/*readFile.ReadGameLevel(worldPositions,Names,parsers);
-	ren.lvlData.SetWorldPosition(worldPositions);
-	ren.lvlData.SetNames(Names);
-	ren.lvlData.SetParser(parsers);*/
-	//ren.lvlData.parsers = parsers;
 	if (+win.Create(0, 0, 800, 600, GWindowStyle::WINDOWEDBORDERED))
 	{
 		
@@ -92,14 +76,19 @@ int main()
 				song.Play(true);
 				aud.PlayMusic();
 			}
+			if (file.compare(""))
+			{
+				filePath = (char*)file.c_str();
+			}
 			Renderer renderer(win, ogl, filePath);
-			
+			file = "";
+		
 			
 			while (+win.ProcessWindowEvents())
 			{
 				glClearColor(clr[0], clr[1], clr[2], clr[3]);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				renderer.UpdateCamera(changeLevel, filePath, playSound);
+				renderer.UpdateCamera(changeLevel, filePath, playSound,PlayMusic,file);
 				if (changeLevel)
 					break;
 				if (playSound && !soundOver)
@@ -110,8 +99,21 @@ int main()
 				sou.isPlaying(soundOver);
 				if (!soundOver && playSound)
 				{
+					if (PlayMusic)
+					{
 					song.Resume();
+					}
 					playSound = false;
+				}
+				bool songPlaying;
+				song.isPlaying(songPlaying);
+				if (PlayMusic && songPlaying == false)
+				{
+					song.Resume();
+				}
+				else if (songPlaying && PlayMusic == false)
+				{
+					song.Pause();
 				}
 				
 				renderer.Render();

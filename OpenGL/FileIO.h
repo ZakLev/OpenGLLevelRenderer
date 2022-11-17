@@ -5,8 +5,8 @@
 #include <vector>
 #include "h2bParser.h"
 #include "Model.h"
-
-
+#include <commdlg.h>
+//#include <GLFW/glfw3.h>
 #define GATEWARE_ENABLE_MATH  // Math Library
 class FileIO
 {
@@ -38,20 +38,16 @@ void ReadGameLevel(std::vector<Model>& models,const char* fileName = "../../Asse
                    line.erase(checkDecimal);
                }
                std::string namePath = "../../Assets/Models/" + line + ".h2b";
-               /*Model* newModel = new Model();
-               newModel->Name = line;
-               newModel->NamePath = namePath;*/
+               
                Model newModel;
                newModel.Name = line;
                newModel.NamePath = namePath;
-               //Names.push_back(namePath);
+               
                parser.Clear();
                parser.Parse(namePath.c_str());
                //newModel->parser = parser;
                newModel.parser = parser;
-               //parsers.push_back(parser);
-               //verts.push_back(parser.vertices);
-              // parser.Clear();
+               
                GW::MATH::GMATRIXF mat = GW::MATH::GIdentityMatrixF;
                
                int k = 0;
@@ -72,15 +68,11 @@ void ReadGameLevel(std::vector<Model>& models,const char* fileName = "../../Asse
                    }
                   
                }
-              // worldPositions.push_back(mat);
-              // newModel->worldPosition = mat;
+             
                newModel.worldPosition = mat;
-             //  models.reserve(models.size() + 1);
-             //  //models.resize(models.size() + 1);
-             //  models.emplace_back(newModel);
+            
                models.push_back(newModel);
-             //  models.shrink_to_fit();
-            //   std::cout << newModel->Name << std::endl;
+             
            }
         }
     }
@@ -95,5 +87,26 @@ void filter(std::string &line)
         }
     }
     line = temp;
+}
+std::string OpenFile(const char* filter, GW::SYSTEM::GWindow win)
+{
+    OPENFILENAMEA ofn;
+    CHAR fileSize[180] = { 0 };
+    ZeroMemory(&ofn, sizeof(OPENFILENAME));
+    ofn.lStructSize = sizeof(OPENFILENAME);
+    GW::SYSTEM::UNIVERSAL_WINDOW_HANDLE w;
+    win.GetWindowHandle(w);
+    HWND* window = (HWND*)&w;
+    ofn.hwndOwner = *window;
+    ofn.lpstrFile = fileSize;
+    ofn.nMaxFile = sizeof(fileSize);
+    ofn.lpstrFilter = filter;
+    ofn.nFilterIndex = 1;
+    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST | OFN_NOCHANGEDIR;
+    if (GetOpenFileNameA(&ofn) == true)
+    {
+        return ofn.lpstrFile;
+    }
+    return "";
 }
 };
