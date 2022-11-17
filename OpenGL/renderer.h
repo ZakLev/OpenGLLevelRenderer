@@ -471,14 +471,14 @@ void main()
 				}
 				std::vector<std::string> faces;
 				
-				 if (filePath.compare("../../Assets/GameLevel2.txt") == 0)
+				 if (filePath.compare("../../../Assets/GameLevel2.txt") == 0)
 				{
-					std::string right = "../../Assets/skybox2/right.jpg";
-					std::string left = "../../Assets/skybox2/left.jpg";
-					std::string top = "../../Assets/skybox2/top.jpg";
-					std::string bottom = "../../Assets/skybox2/bottom.jpg";
-					std::string front = "../../Assets/skybox2/front.jpg";
-					std::string back = "../../Assets/skybox2/back.jpg";
+					std::string right = "../../../Assets/skybox2/right.jpg";
+					std::string left = "../../../Assets/skybox2/left.jpg";
+					std::string top = "../../../Assets/skybox2/top.jpg";
+					std::string bottom = "../../../Assets/skybox2/bottom.jpg";
+					std::string front = "../../../Assets/skybox2/front.jpg";
+					std::string back = "../../../Assets/skybox2/back.jpg";
 					faces.push_back(right);
 					faces.push_back(left);
 					faces.push_back(top);
@@ -490,12 +490,12 @@ void main()
 				 {
 
 
-					 std::string right = "../../Assets/skybox/right.jpg";
-					 std::string left = "../../Assets/skybox/left.jpg";
-					 std::string top = "../../Assets/skybox/top.jpg";
-					 std::string bottom = "../../Assets/skybox/bottom.jpg";
-					 std::string front = "../../Assets/skybox/front.jpg";
-					 std::string back = "../../Assets/skybox/back.jpg";
+					 std::string right = "../../../Assets/skybox/right.jpg";
+					 std::string left = "../../../Assets/skybox/left.jpg";
+					 std::string top = "../../../Assets/skybox/top.jpg";
+					 std::string bottom = "../../../Assets/skybox/bottom.jpg";
+					 std::string front = "../../../Assets/skybox/front.jpg";
+					 std::string back = "../../../Assets/skybox/back.jpg";
 					 faces.push_back(right);
 					 faces.push_back(left);
 					 faces.push_back(top);
@@ -691,17 +691,17 @@ void main()
 			float pauseMusic = 0;
 			float playMusic = 0;
 			GIn.GetState(G_KEY_4, levelChange2);
-			if (levelChange2 != 0 && filePath != "../../Assets/GameLevel2.txt")
+			if (levelChange2 != 0 && filePath != "../../../Assets/GameLevel2.txt")
 			{
 				levelChange2 = 0;
-				fileName = "../../Assets/GameLevel2.txt";
+				fileName = "../../../Assets/GameLevel2.txt";
 				changeLevel = true;
 			}
 			GIn.GetState(G_KEY_3, levelChange1);
-			if (levelChange1 != 0 && filePath != "../../Assets/GameLevel.txt")
+			if (levelChange1 != 0 && filePath != "../../../Assets/GameLevel.txt")
 			{
 				levelChange1 = 0;
-				fileName = "../../Assets/GameLevel.txt";
+				fileName = "../../../Assets/GameLevel.txt";
 				changeLevel = true;
 				
 			}

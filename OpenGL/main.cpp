@@ -39,10 +39,10 @@ int main()
 	bool openDialogue = false;
 	bool PlayMusic = true;
 	int level = 0;
-	char* filePath = "../../Assets/GameLevel.txt";
+	char* filePath = "../../../Assets/GameLevel.txt";
 	std::string file = "";
-	char* musicPath = "../../Assets/Music/OOOF.wav";
-	char* soundPath = "../../Assets/Sound/AUG.wav";
+	char* musicPath = "../../../Assets/Music/OOOF.wav";
+	char* soundPath = "../../../Assets/Sound/AUG.wav";
 	GW::AUDIO::GMusic song;
 	GW::AUDIO::GAudio aud;
 	GW::AUDIO::GSound sou;
